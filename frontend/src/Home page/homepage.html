@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>myWallet Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="app">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <h2 class="logo">myWallet</h2>
+
+    <nav>
+      <a class="active">🏠 Home</a>
+      <a>📁 Files</a>
+      <a>📊 Analytics</a>
+      <a>📈 Charts</a>
+      <a>⚙️ Settings</a>
+    </nav>
+
+    <button class="logout">Log Out</button>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+
+    <header>
+      <h1>Dashboard</h1>
+      <p>10:30 PM – 14th August 2022</p>
+    </header>
+
+    <!-- Stats -->
+    <section class="stats">
+      <div class="card green">
+        <span>Points</span>
+        <h2>2500</h2>
+      </div>
+      <div class="card green">
+        <span>Today’s target</span>
+        <h2>100</h2>
+      </div>
+      <div class="card green">
+        <span>Available</span>
+        <h2>20</h2>
+      </div>
+      <div class="card purple">
+        <span>Your Goal</span>
+        <h2>3.4K</h2>
+      </div>
+    </section>
+
+    <!-- Content -->
+    <section class="content">
+
+      <!-- To-do -->
+      <div class="todo">
+        <h3>To-do lists</h3>
+
+        <label><input type="checkbox" /> Label <small>Description</small></label>
+        <label><input type="checkbox" /> Label <small>Description</small></label>
+        <label><input type="checkbox" /> Label <small>Description</small></label>
+      </div>
+
+      <!-- Calendar -->
+      <div class="calendar">
+        <h3>Calendar</h3>
+        <div class="calendar-box">
+          <!-- Static calendar UI -->
+          <div class="dates">
+            <span class="active">9</span>
+            <span>10</span>
+            <span>11</span>
+            <span>12</span>
+            <span>13</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom cards -->
+      <div class="small-card">Total Sales</div>
+      <div class="small-card">Balance</div>
+      <div class="wide-card">Tasks Completed</div>
+
+    </section>
+  </main>
+</div>
+
+</body>
+</html>

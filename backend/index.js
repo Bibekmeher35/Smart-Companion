@@ -1,50 +1,87 @@
 import express from "express";
 import cors from "cors";
-import OpenAI from "openai";
 import { sanitize } from "./sanitize.js";
-
 import dotenv from "dotenv";
+import fetch from "node-fetch";
+
 dotenv.config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_KEY
-});
+async function callGemini(prompt) {
+  const response = await fetch(
+    "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent?key=" +
+      process.env.GEMINI_API_KEY,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [
+          {
+            parts: [{ text: prompt }],
+          },
+        ],
+      }),
+    },
+  );
 
+  if (!response.ok) {
+    throw new Error(await response.text());
+  }
+
+  const data = await response.json();
+  return data.candidates[0].content.parts[0].text;
+}
 
 app.get("/", (req, res) => {
   res.send("Smart Companion Backend Running");
 });
+
 app.post("/decompose", async (req, res) => {
   const cleanTask = sanitize(req.body.task);
+  const profile = req.body.profile || {};
+
+  const stepRules = {
+    low: "Break the task into 3–4 high-level steps.",
+    medium: "Break the task into 5–7 clear steps.",
+    high: "Break the task into very small, concrete micro-steps (8–12 steps).",
+  };
 
   try {
     const prompt = `
-You are a supportive assistant for neurodivergent users.
-Break the task into very small steps.
-One step = one action.
-Each step under 5 minutes.
-Use simple language.
-Return steps as a numbered list.
+You are a neuro-inclusive task assistant.
+
+Rules:
+- Use very simple language
+- One action per step
+- No explanations
+- No emojis
+- Max 1 short sentence per step
+
+User preferences:
+- Step detail: ${profile.stepLevel || "medium"}
+- Dyslexia-friendly mode: ${profile.dyslexiaMode ? "Yes" : "No"}
+
+Task:
+"${cleanTask}"
+
+${stepRules[profile.stepLevel] || stepRules["medium"]}
+
+Return ONLY the steps, each on a new line.
 `;
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        { role: "system", content: prompt },
-        { role: "user", content: cleanTask }
-      ]
-    });
+    const text = await callGemini(prompt);
 
-    return res.json({
-      steps: response.choices[0].message.content
-    });
+    const steps = text
+      .split("\n")
+      .map((s) => s.replace(/^\d+[.)\s]*/, "").trim())
+      .filter(Boolean);
 
+    return res.json({ steps });
   } catch (error) {
-    console.error("AI unavailable or quota exceeded. Using fallback.", error.message);
+    console.error("Gemini unavailable, using fallback:", error.message);
 
     return res.json({
       steps: [
@@ -52,8 +89,8 @@ Return steps as a numbered list.
         "Put books or objects on the table",
         "Throw visible trash into the bin",
         "Wipe one surface",
-        "Take a short break"
-      ]
+        "Take a short break",
+      ],
     });
   }
 });
@@ -61,87 +98,3 @@ Return steps as a numbered list.
 app.listen(5050, () => {
   console.log("Server running on port 5050");
 });
-
-// import express from "express";
-// import cors from "cors";
-// import OpenAI from "openai";
-// import { sanitize } from "./sanitize.js";
-
-// import dotenv from "dotenv";
-// dotenv.config();
-
-// const app = express();
-// app.use(cors());
-// app.use(express.json());
-
-// const openai = new OpenAI({
-//   apiKey: process.env.OPENAI_KEY
-// });
-
-// app.post("/decompose", async (req, res) => {
-//   const cleanTask = sanitize(req.body.task);
-
-//   const prompt = `
-// Break the task into very small steps.
-// One step = one action.
-// Each step under 5 minutes.
-// Use simple language.
-// `;
-
-//   const response = await openai.chat.completions.create({
-//     model: "gpt-4o-mini",
-//     messages: [
-//       { role: "system", content: prompt },
-//       { role: "user", content: cleanTask }
-//     ]
-//   });
-
-//   res.json({ steps: response.choices[0].message.content });
-// });
-
-// app.get("/", (req, res) => {
-//   res.send("Smart Companion Backend Running");
-// });
-// app.post("/decompose", async (req, res) => {
-//   const cleanTask = sanitize(req.body.task);
-
-//   try {
-//     const prompt = `
-// You are a supportive assistant for neurodivergent users.
-// Break the task into very small steps.
-// One step = one action.
-// Each step under 5 minutes.
-// Use simple language.
-// Return steps as a numbered list.
-// `;
-
-//     const response = await openai.chat.completions.create({
-//       model: "gpt-4o-mini",
-//       messages: [
-//         { role: "system", content: prompt },
-//         { role: "user", content: cleanTask }
-//       ]
-//     });
-
-//     return res.json({
-//       steps: response.choices[0].message.content
-//     });
-
-//   } catch (error) {
-//     console.error("AI unavailable or quota exceeded. Using fallback.", error.message);
-
-//     return res.json({
-//       steps: [
-//         "Pick up items from the floor",
-//         "Put books or objects on the table",
-//         "Throw visible trash into the bin",
-//         "Wipe one surface",
-//         "Take a short break"
-//       ]
-//     });
-//   }
-// });
-
-// app.listen(5050, () => {
-//   console.log("Server running on port 5050");
-// });
