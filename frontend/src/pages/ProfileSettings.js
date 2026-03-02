@@ -1,36 +1,39 @@
 import React from "react";
 
-function ProfileSettings({ profile, onSave }) {
+function ProfileSettings({ profile = {}, onSave }) {
+  const stepLevel = profile.stepLevel || "medium";
+  const dyslexiaMode = !!profile.dyslexiaMode;
+
   const update = (key, value) => {
     onSave({ ...profile, [key]: value });
   };
 
   return (
-    <div style={{ marginTop: "20px", padding: "20px", border: "1px solid #ccc" }}>
-      <h3>Profile Settings</h3>
+    <div className="profile-settings">
+      <div className="profile-row">
+        <label className="profile-label">Step granularity</label>
+        <select
+          className="profile-select"
+          value={stepLevel}
+          onChange={(e) => update("stepLevel", e.target.value)}
+        >
+          <option value="low">Low (quick overview)</option>
+          <option value="medium">Medium (balanced)</option>
+          <option value="high">High (micro‑steps)</option>
+        </select>
+      </div>
 
-      {/* STEP GRANULARITY */}
-      <label>Step Granularity</label>
-      <select
-        value={profile.stepLevel}
-        onChange={(e) => update("stepLevel", e.target.value)}
-      >
-        <option value="low">Low (Quick)</option>
-        <option value="medium">Medium (Balanced)</option>
-        <option value="high">High (Micro Steps)</option>
-      </select>
-
-      <br /><br />
-
-      {/* DYSLEXIA MODE */}
-      <label>
-        <input
-          type="checkbox"
-          checked={profile.dyslexiaMode}
-          onChange={(e) => update("dyslexiaMode", e.target.checked)}
-        />
-        Dyslexia-friendly mode
-      </label>
+      <div className="profile-row">
+        <label className="profile-label">Reading comfort</label>
+        <label className="profile-toggle">
+          <input
+            type="checkbox"
+            checked={dyslexiaMode}
+            onChange={(e) => update("dyslexiaMode", e.target.checked)}
+          />
+          <span>Dyslexia‑friendly mode</span>
+        </label>
+      </div>
     </div>
   );
 }

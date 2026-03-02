@@ -8,7 +8,7 @@
 
 /* Sidebar */
 .sidebar {
-  width: 200px;
+  width: 220px;
   background: #6f8fbf;
   color: white;
   padding: 20px;
@@ -20,7 +20,22 @@
   height: 100vh;
   flex-shrink: 1;
   z-index: 1000;
-  transition: transform 0.3s ease;
+  transition: width 0.3s ease;
+}
+
+/* Sidebar open/close states (width-based) */
+.sidebar.open {
+  width: 220px;
+}
+
+.sidebar.closed {
+  width: 64px;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 .sideList{
   display: flex;
@@ -28,43 +43,174 @@
   gap: 10px;
 }
 .sideFull{
-  padding: 20px;
+  padding: 20px 0;
   display: flex;
   flex-direction: column;
-  align-self: center;
-  position: fixed;
-  bottom: 0;
-  z-index: 1000;
+  margin-top: auto;
+  align-items: stretch;
 }
 .brand {
   margin-bottom: 30px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-text {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.brand-logo {
+  display: inline-flex;
+  width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  color: #ffffff;
+  font-size: 22px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
 .sidebar nav button {
   background: none;
   border: none;
   color: white;
-  padding: 12px;
+  padding: 10px 8px;
   text-align: left;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.sidebar nav button:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.nav-item.active {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.nav-item.active .nav-label {
+  font-weight: 600;
+}
+
+.nav-icon {
+  display: inline-flex;
+  width: 32px;
+  height: 32px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  font-size: 18px;
+}
+
+.nav-label {
+  white-space: nowrap;
+}
+
+/* Collapse text when sidebar is closed */
+.sidebar.closed .nav-label {
+  display: none;
+}
+
+/* Per-item accent colors for modern feel */
+.nav-item-home .nav-icon {
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+}
+
+.nav-item-task .nav-icon {
+  background: linear-gradient(135deg, #f7971e, #ffd200);
+}
+
+.nav-item-analytics .nav-icon {
+  background: linear-gradient(135deg, #a18cd1, #fbc2eb);
+}
+
+.nav-item-charts .nav-icon {
+  background: linear-gradient(135deg, #11998e, #38ef7d);
+}
+
+.nav-item-settings .nav-icon {
+  background: linear-gradient(135deg, #ff5858, #f09819);
 }
 
 .logout {
   margin-top: auto;
-  background: none;
-  font-weight: bold;
-  border: 2px solid rgb(255, 55, 0);
-  border-radius: 20px;
-  color: rgb(228, 26, 23);
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 18px;
+  background: linear-gradient(135deg, #ff5858, #f09819);
+  border-radius: 999px;
+  color: #ffffff;
+  border: none;
   cursor: pointer;
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+}
+
+.logout:hover {
+  background: linear-gradient(135deg, #ff7b7b, #ffb347);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+  transform: translateY(-1px);
+}
+
+.logout-icon {
+  display: inline-flex;
+  width: 24px;
+  height: 24px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+  font-size: 16px;
+}
+
+.logout-label {
+  white-space: nowrap;
+}
+
+/* Compact logout when sidebar is collapsed */
+.sidebar.closed .sideFull {
+  width: 100%;
+  padding: 12px 0;
+}
+
+.sidebar.closed .logout {
+  width: 52px;
+  padding: 8px;
+  border-radius: 50%;
+  justify-content: center;
+}
+
+.sidebar.closed .logout-label {
+  display: none;
+}
+
+/* Ensure logout icon is always visible in collapsed state */
+.sidebar.closed .logout-icon {
+  display: inline-flex;
+  width: 26px;
+  height: 26px;
 }
 
 /* Main */
 .dashboard-main {
   flex: 1;
-  width: 100%;
-  max-width: 1400px;
-  margin-left: 260px; /* fixed sidebar width */
   padding: 24px 40px;
   overflow-y: auto;
 }
@@ -81,6 +227,27 @@
   align-items: center;
   gap: 16px;
   padding: 16px 0;
+}
+
+/* Sidebar toggle button inside sidebar header */
+.sidebar-toggle {
+  background: #6f8fbf;
+  color: #ffffff;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
+}
+
+.sidebar-toggle:hover {
+  background: #5a76a0;
 }
 
 .top-actions {
@@ -143,6 +310,89 @@
   border-radius: 16px;
   padding: 14px 16px;
   min-width: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+}
+
+.settings-section {
+  margin-top: 24px;
+}
+
+.settings-card {
+  max-width: 520px;
+}
+
+.settings-subtitle {
+  margin-top: 4px;
+  margin-bottom: 16px;
+  font-size: 0.9rem;
+  color: #4b5563;
+}
+
+.profile-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.profile-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.profile-label {
+  font-size: 0.9rem;
+  color: #374151;
+}
+
+.profile-select {
+  min-width: 200px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: #f9fafb;
+}
+
+.profile-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: #374151;
+}
+
+.history-list {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  font-size: 0.9rem;
+  color: #444;
+}
+
+.history-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+}
+
+.history-title {
+  max-width: 70%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.history-date {
+  font-size: 0.8rem;
+  color: #777;
 }
 /* Remove duplicate dashboard-main block and merge .topbar definitions as per instructions */
 /* Desktop enhancement only */
@@ -158,12 +408,9 @@
     flex-direction: column;
   }
 
-  .sidebar {
-    transform: translateX(-100%);
-  }
-
   .dashboard-main {
     margin-left: 0 !important;
+    width: 100% !important;
     padding: 16px;
   }
 

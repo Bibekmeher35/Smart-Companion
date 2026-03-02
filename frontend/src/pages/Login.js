@@ -8,13 +8,18 @@ export default function Login({ onLogin }) {
   const [password, setPassword] = useState("");
   const [isNewUser, setIsNewUser] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleLogin = async () => {
+    if (loading) return;
+    setError("");
+
     const u = username.trim();
     const p = password.trim();
 
     if (!u || !p) {
-      alert("Enter username and password");
+      setError("Enter username and password.");
       return;
     }
 
@@ -23,9 +28,11 @@ export default function Login({ onLogin }) {
     /* ================= CREATE ACCOUNT ================= */
     if (isNewUser) {
       if (user) {
-        alert("User already exists! Please login.");
+        setError("User already exists. Please login instead.");
         return;
       }
+
+      setLoading(true);
 
       const passwordHash = await bcrypt.hash(p, 10);
 
@@ -37,6 +44,7 @@ export default function Login({ onLogin }) {
           currentStreak: 0,
         },
         rewards: [],
+        history: [],
         createdAt: new Date().toISOString(),
       };
 
@@ -48,19 +56,23 @@ export default function Login({ onLogin }) {
         userData: newUserData,
       });
 
+      setLoading(false);
       return;
     }
 
     /* ================= LOGIN ================= */
     if (!user) {
-      alert("No user found");
+      setError("No user found with that username.");
       return;
     }
+
+    setLoading(true);
 
     const isValid = await bcrypt.compare(p, user.passwordHash);
 
     if (!isValid) {
-      alert("Wrong password");
+      setError("Wrong password. Please try again.");
+      setLoading(false);
       return;
     }
 
@@ -69,72 +81,79 @@ export default function Login({ onLogin }) {
       authToken: user.passwordHash,
       userData: user,
     });
+
+    setLoading(false);
   };
 
   return (
-    <div className="login-container">
-      <h2>Smart Companion</h2>
-
-      {/* Username */}
-      <div className="input-group">
-        <label>
-          Username <span style={{ color: "red" }}>*</span>
-        </label>
-        <input
-          type="text"
-          placeholder="Enter username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
+    <div className="login-root">
+      <div className="login-hero">
+        <h1>Smart Companion</h1>
+        <p>Turn big tasks into simple, guided steps.</p>
       </div>
 
-      {/* Password */}
-      <div className="input-group" style={{ position: "relative" }}>
-        <label>
-          Password <span style={{ color: "red" }}>*</span>
-        </label>
+      <div className="login-container">
+        <h2>{isNewUser ? "Create your account" : "Welcome back"}</h2>
 
-        <input
-          type={showPassword ? "text" : "password"}
-          placeholder="Enter password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          style={{ paddingRight: "40px" }}
-        />
+        {/* Username */}
+        <div className="input-group">
+          <label>
+            Username <span style={{ color: "red" }}>*</span>
+          </label>
+          <input
+            type="text"
+            placeholder="Enter username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+        </div>
 
-        <span
-          onClick={() => setShowPassword(!showPassword)}
-          style={{
-            position: "absolute",
-            right: "10px",
-            top: "38px",
-            cursor: "pointer",
-            userSelect: "none",
-          }}
+        {/* Password */}
+        <div className="input-group password-group">
+          <label>
+            Password <span style={{ color: "red" }}>*</span>
+          </label>
+
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="Enter password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+
+          <span
+            className="password-toggle"
+            onClick={() => setShowPassword(!showPassword)}
+          >
+            {showPassword ? "Hide" : "Show"}
+          </span>
+        </div>
+
+        {error && <div className="login-error">{error}</div>}
+
+        {/* Button */}
+        <button
+          id="login-btn"
+          onClick={handleLogin}
+          disabled={loading}
+          className={loading ? "loading" : ""}
         >
-          {showPassword ? "🙈" : "👁️"}
-        </span>
+          {loading
+            ? isNewUser
+              ? "Creating account..."
+              : "Signing in..."
+            : isNewUser
+            ? "Create Account"
+            : "Login"}
+        </button>
+
+        {/* Toggle */}
+        <p className="login-toggle" onClick={() => setIsNewUser(!isNewUser)}>
+          {isNewUser
+            ? "Already have an account? Login"
+            : "New user? Create account"}
+        </p>
       </div>
-
-      {/* Button */}
-      <button id="login-btn" onClick={handleLogin}>
-        {isNewUser ? "Create Account" : "Login"}
-      </button>
-
-      {/* Toggle */}
-      <p
-        style={{
-          marginTop: "15px",
-          color: "#555",
-          cursor: "pointer",
-          textDecoration: "underline",
-        }}
-        onClick={() => setIsNewUser(!isNewUser)}
-      >
-        {isNewUser
-          ? "Already have an account? Login"
-          : "New user? Create account"}
-      </p>
     </div>
   );
 }

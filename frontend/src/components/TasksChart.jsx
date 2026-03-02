@@ -6,8 +6,14 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-export default function TasksChart({ total = 0 }) {
-  const data = [{ name: "Progress", value: total }];
+export default function TasksChart({ total = 0, history = [] }) {
+  const data =
+    history && history.length
+      ? history.map((item, idx) => ({
+          name: item.label || `#${idx + 1}`,
+          value: item.value ?? 0,
+        }))
+      : [{ name: "Progress", value: total }];
 
   return (
     <ResponsiveContainer width="100%" height={160}>
