@@ -19,6 +19,7 @@ export default function DashboardLayout({
   history = [],
   profile,
   updateProfile,
+  onLogout,
   task,
   setTask,
   steps,
@@ -152,8 +153,7 @@ export default function DashboardLayout({
             <button
               className="logout"
               onClick={() => {
-                localStorage.clear();
-                window.location.reload();
+                if (onLogout) onLogout();
               }}
             >
               <span className="logout-icon">

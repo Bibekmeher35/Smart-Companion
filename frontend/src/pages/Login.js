@@ -2,6 +2,7 @@ import { useState } from "react";
 import { loadUser, saveUser } from "../utils/storage";
 import bcrypt from "bcryptjs";
 import "./login.css";
+import { MdVisibility, MdVisibilityOff } from "react-icons/md";
 
 export default function Login({ onLogin }) {
   const [username, setUsername] = useState("");
@@ -114,19 +115,24 @@ export default function Login({ onLogin }) {
             Password <span style={{ color: "red" }}>*</span>
           </label>
 
-          <input
-            type={showPassword ? "text" : "password"}
-            placeholder="Enter password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+          <div className="password-field">
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Enter password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
 
-          <span
-            className="password-toggle"
-            onClick={() => setShowPassword(!showPassword)}
-          >
-            {showPassword ? "Hide" : "Show"}
-          </span>
+            <button
+              type="button"
+              className="password-toggle"
+              onClick={() => setShowPassword((prev) => !prev)}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              title={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? <MdVisibilityOff /> : <MdVisibility />}
+            </button>
+          </div>
         </div>
 
         {error && <div className="login-error">{error}</div>}

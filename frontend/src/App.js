@@ -119,6 +119,13 @@ function App() {
     setTaskFinished(false);
   };
 
+  const logout = () => {
+    // Do NOT clear localStorage here (it stores all users).
+    // Just end the current session and reset in-memory state.
+    resetTaskSession();
+    setSession(null);
+  };
+
   return (
     <div style={{ minHeight: "100vh", background: "#f4f6f8" }}>
       <DashboardLayout
@@ -133,6 +140,7 @@ function App() {
           saveUser(session.username, updatedUserData);
           setSession({ ...session, userData: updatedUserData });
         }}
+        onLogout={logout}
         task={task}
         setTask={setTask}
         steps={steps}
