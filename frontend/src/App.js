@@ -21,16 +21,18 @@ function App() {
       alert("Please enter a task");
       return;
     }
-
     try {
-      const res = await fetch("http://localhost:5050/decompose", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          task,
-          profile: session.userData.profile,
-        }),
-      });
+      const res = await fetch(
+        "https://smart-companion-backend.onrender.com/decompose",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            task,
+            profile: session.userData.profile,
+          }),
+        },
+      );
 
       if (!res.ok) {
         throw new Error("Backend error");
