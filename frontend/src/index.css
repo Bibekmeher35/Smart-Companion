@@ -7,6 +7,23 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+html.dyslexia-mode,
+html.dyslexia-mode body {
+  letter-spacing: 0.015em;
+  word-spacing: 0.08em;
+  line-height: 1.7;
+  text-rendering: optimizeLegibility;
+  font-variant-ligatures: none;
+}
+
+html.dyslexia-mode input,
+html.dyslexia-mode textarea,
+html.dyslexia-mode select,
+html.dyslexia-mode button {
+  letter-spacing: 0.015em;
+  line-height: 1.5;
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;

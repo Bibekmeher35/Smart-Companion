@@ -3,6 +3,8 @@ import Calendar from "../components/Calendar";
 import TasksChart from "../components/TasksChart";
 import TaskPage from "./TaskPage";
 import ProfileSettings from "./ProfileSettings";
+import AnalyticsPage from "./AnalyticsPage";
+import ChartsPage from "./ChartsPage";
 import { loadUser, saveUser } from "../utils/storage";
 import bcrypt from "bcryptjs";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -446,6 +448,14 @@ export default function DashboardLayout({
             resetTaskSession={resetTaskSession}
             onBack={() => setActiveItem("dashboard")}
           />
+        ) : activeItem === "analytics" ? (
+          <AnalyticsPage
+            username={username}
+            progress={progress || {}}
+            history={history || []}
+          />
+        ) : activeItem === "charts" ? (
+          <ChartsPage progress={progress || {}} history={history || []} />
         ) : activeItem === "settings" ? (
           <section className="settings-section">
             <div className="card settings-card">

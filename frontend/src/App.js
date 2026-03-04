@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Login from "./pages/Login";
 import { saveUser } from "./utils/storage";
 import DashboardLayout from "./pages/DashboardLayout";
@@ -10,6 +10,13 @@ function App() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [currentTaskTitle, setCurrentTaskTitle] = useState("");
   const [taskFinished, setTaskFinished] = useState(false);
+
+  const dyslexiaMode = !!session?.userData?.profile?.dyslexiaMode;
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    document.documentElement.classList.toggle("dyslexia-mode", dyslexiaMode);
+  }, [dyslexiaMode]);
 
   // 🔐 LOGIN GUARD
   if (!session) {
@@ -125,6 +132,9 @@ function App() {
   };
 
   const logout = () => {
+    if (typeof document !== "undefined") {
+      document.documentElement.classList.remove("dyslexia-mode");
+    }
     resetTaskSession();
     setSession(null);
   };
