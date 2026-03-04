@@ -1,4 +1,4 @@
-// import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
 export default function TaskPage({
   task,
@@ -11,6 +11,8 @@ export default function TaskPage({
   resetTaskSession,
   onBack,
 }) {
+  const [loading, setLoading] = useState(false);
+
   const isLastStep = steps.length > 0 && currentIndex === steps.length - 1;
 
   const handleMarkDone = () => {
@@ -44,7 +46,7 @@ export default function TaskPage({
         <input
           value={task}
           onChange={(e) => setTask(e.target.value)}
-          placeholder="Enter your task..."
+          placeholder="Enter your task (ex: How to clean room)"
           style={{
             flex: 1,
             padding: "10px",
@@ -53,19 +55,59 @@ export default function TaskPage({
           }}
         />
         <button
-          onClick={sendTask}
+          onClick={async () => {
+            if (!task.trim()) return;
+            setLoading(true);
+            await sendTask();
+            setLoading(false);
+          }}
+          disabled={loading}
           style={{
-            background: "#4f46e5",
+            background: loading ? "#a5b4fc" : "#4f46e5",
             color: "white",
             border: "none",
             padding: "10px 16px",
             borderRadius: "6px",
-            cursor: "pointer",
+            cursor: loading ? "not-allowed" : "pointer",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
           }}
         >
-          Generate
+          {loading && (
+            <span
+              style={{
+                width: "16px",
+                height: "16px",
+                border: "2px solid white",
+                borderTop: "2px solid transparent",
+                borderRadius: "50%",
+                animation: "spin 0.8s linear infinite",
+              }}
+            />
+          )}
+          {loading ? "Generating..." : "Generate"}
         </button>
       </div>
+
+      {loading && (
+        <div
+          style={{
+            marginBottom: "20px",
+            background: "#eef2ff",
+            padding: "12px 16px",
+            borderRadius: "8px",
+            color: "#3730a3",
+            fontSize: "14px",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            animation: "fadeIn 0.3s ease-in-out",
+          }}
+        >
+          ⏳ Please wait... This may take 5–7 seconds while we break your task into clear steps.
+        </div>
+      )}
 
       {steps.length > 0 && !taskFinished && (
         <div
@@ -130,6 +172,18 @@ export default function TaskPage({
           </button>
         </div>
       )}
+      <style>
+        {`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+          @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+        `}
+      </style>
     </div>
   );
 }
