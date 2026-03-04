@@ -7,6 +7,7 @@ import { useState, useMemo } from "react";
 import {
   MdHome,
   MdChecklist,
+  MdMenu,
   MdInsights,
   MdShowChart,
   MdSettings,
@@ -165,6 +166,15 @@ export default function DashboardLayout({
         </aside>
       }
 
+      {sidebarOpen && (
+        <button
+          type="button"
+          className="sidebar-backdrop"
+          aria-label="Close menu"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       <main
         className="dashboard-main"
         style={{
@@ -174,15 +184,28 @@ export default function DashboardLayout({
         }}
       >
         <header className="topbar">
-          <div>
+          <button
+            type="button"
+            className="mobile-menu-btn"
+            onClick={() => setSidebarOpen(true)}
+            aria-label="Open menu"
+          >
+            <MdMenu />
+          </button>
+
+          <div className="topbar-title">
             <h1>Dashboard</h1>
             <p>{nowLabel}</p>
           </div>
 
           <div className="top-actions">
             <input placeholder="Search" />
-            <span>🔔</span>
-            <span>👤</span>
+            <button type="button" className="top-icon" aria-label="Notifications">
+              🔔
+            </button>
+            <button type="button" className="top-icon" aria-label="Profile">
+              👤
+            </button>
           </div>
         </header>
 

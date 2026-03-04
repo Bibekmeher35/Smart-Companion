@@ -28,6 +28,7 @@ export default function TaskPage({
   };
   return (
     <div
+      className="task-page"
       style={{
         maxWidth: "800px",
         margin: "40px auto",

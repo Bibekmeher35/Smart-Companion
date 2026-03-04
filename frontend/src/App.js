@@ -21,6 +21,7 @@ function App() {
       alert("Please enter a task");
       return;
     }
+
     try {
       const res = await fetch(
         "https://smart-companion-backend.onrender.com/decompose",
@@ -29,7 +30,7 @@ function App() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             task,
-            profile: session.userData.profile,
+            profile: session?.userData?.profile || {},
           }),
         },
       );
@@ -42,7 +43,7 @@ function App() {
 
       const parsedSteps = Array.isArray(data.steps)
         ? data.steps
-        : data.steps.split("\n").filter((s) => s.trim() !== "");
+        : data.steps?.split("\n").filter((s) => s.trim() !== "") || [];
 
       setCurrentTaskTitle(task);
       setSteps(parsedSteps);
@@ -50,34 +51,35 @@ function App() {
       setTask("");
       setTaskFinished(false);
     } catch (err) {
+      console.error(err);
       alert("Backend not reachable");
     }
   };
 
   const markDone = () => {
     if (currentIndex < steps.length - 1) {
-      setCurrentIndex(currentIndex + 1);
+      setCurrentIndex((prev) => prev + 1);
       return;
     }
 
-    const updated = { ...session.userData };
-    updated.progress.tasksCompleted += 1;
-    updated.progress.currentStreak += 1;
+    const updated = {
+      ...session.userData,
+      progress: {
+        tasksCompleted: (session.userData?.progress?.tasksCompleted || 0) + 1,
+        currentStreak: (session.userData?.progress?.currentStreak || 0) + 1,
+        completedDates: [...(session.userData?.progress?.completedDates || [])],
+      },
+      rewards: [...(session.userData?.rewards || [])],
+      history: [...(session.userData?.history || [])],
+    };
 
     const today = new Date().toISOString().split("T")[0];
-
-    if (!updated.progress.completedDates) {
-      updated.progress.completedDates = [];
-    }
 
     if (!updated.progress.completedDates.includes(today)) {
       updated.progress.completedDates.push(today);
     }
 
-    // 🕒 Per‑task history
-    if (!Array.isArray(updated.history)) {
-      updated.history = [];
-    }
+    // 🕒 Task History
     updated.history.push({
       title: currentTaskTitle || null,
       completedAt: new Date().toISOString(),
@@ -85,7 +87,7 @@ function App() {
       tasksCompleted: updated.progress.tasksCompleted,
     });
 
-    // 🎖 Rewards Logic
+    // 🎖 Rewards
     if (
       updated.progress.tasksCompleted === 1 &&
       !updated.rewards.includes("First Step")
@@ -109,6 +111,7 @@ function App() {
 
     saveUser(session.username, updated);
     setSession({ ...session, userData: updated });
+
     setCurrentTaskTitle("");
     setTaskFinished(true);
   };
@@ -122,8 +125,6 @@ function App() {
   };
 
   const logout = () => {
-    // Do NOT clear localStorage here (it stores all users).
-    // Just end the current session and reset in-memory state.
     resetTaskSession();
     setSession(null);
   };
@@ -131,9 +132,9 @@ function App() {
   return (
     <div style={{ minHeight: "100vh", background: "#f4f6f8" }}>
       <DashboardLayout
-        progress={session.userData.progress}
-        history={session.userData.history || []}
-        profile={session.userData.profile || {}}
+        progress={session?.userData?.progress || {}}
+        history={session?.userData?.history || []}
+        profile={session?.userData?.profile || {}}
         updateProfile={(nextProfile) => {
           const updatedUserData = {
             ...session.userData,

@@ -2,18 +2,27 @@ import express from "express";
 import cors from "cors";
 import { sanitize } from "./sanitize.js";
 import dotenv from "dotenv";
-import fetch from "node-fetch";
 
 dotenv.config();
 
 const app = express();
-app.use(cors());
+
+/* ✅ Proper CORS for Production */
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000",
+      "https://your-frontend-name.vercel.app", // 🔁 replace with your real Vercel URL
+    ],
+    methods: ["GET", "POST"],
+  }),
+);
+
 app.use(express.json());
 
 async function callGemini(prompt) {
   const response = await fetch(
-    "https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=" +
-      process.env.GEMINI_API_KEY,
+    `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -35,21 +44,23 @@ async function callGemini(prompt) {
   return data.candidates[0].content.parts[0].text;
 }
 
+/* ✅ Health Check Route */
 app.get("/", (req, res) => {
   res.send("Smart Companion Backend Running");
 });
 
+/* ✅ Main API */
 app.post("/decompose", async (req, res) => {
-  const cleanTask = sanitize(req.body.task);
-  const profile = req.body.profile || {};
-
-  const stepRules = {
-    low: "Break the task into 3–4 high-level steps.",
-    medium: "Break the task into 5–7 clear steps.",
-    high: "Break the task into very small, concrete micro-steps (8–12 steps).",
-  };
-
   try {
+    const cleanTask = sanitize(req.body.task);
+    const profile = req.body.profile || {};
+
+    const stepRules = {
+      low: "Break the task into 3–4 high-level steps.",
+      medium: "Break the task into 5–7 clear steps.",
+      high: "Break the task into very small, concrete micro-steps (8–12 steps).",
+    };
+
     const prompt = `
 You are a neuro-inclusive task assistant.
 
@@ -95,6 +106,9 @@ Return ONLY the steps, each on a new line.
   }
 });
 
-app.listen(5050, () => {
-  console.log("Server running on port 5050");
+/* ✅ CRITICAL FIX FOR RENDER */
+const PORT = process.env.PORT || 5050;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
