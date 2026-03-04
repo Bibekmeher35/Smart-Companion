@@ -132,6 +132,7 @@ function App() {
   return (
     <div style={{ minHeight: "100vh", background: "#f4f6f8" }}>
       <DashboardLayout
+        username={session?.username}
         progress={session?.userData?.progress || {}}
         history={session?.userData?.history || []}
         profile={session?.userData?.profile || {}}
