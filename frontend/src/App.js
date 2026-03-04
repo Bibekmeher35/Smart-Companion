@@ -31,7 +31,7 @@ function App() {
 
     try {
       const res = await fetch(
-        "https://smart-companion-backend.onrender.com/decompose",
+        "https://smart-companion-5znk.onrender.com/decompose",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
