@@ -105,7 +105,8 @@ export default function TaskPage({
             animation: "fadeIn 0.3s ease-in-out",
           }}
         >
-          ⏳ Please wait... This may take 5–7 seconds while we break your task into clear steps.
+          ⏳ Please wait... This may take 5–7 seconds while we break your task
+          into clear steps.
         </div>
       )}
 

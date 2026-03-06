@@ -12,7 +12,8 @@ app.use(
   cors({
     origin: [
       "http://localhost:3000",
-      "https://smart-companion-beta.vercel.app", // 🔁 replace with your real Vercel URL
+      "https://smart-companion-beta.vercel.app",
+      "https://bibekg62rtrjsivganup.drops.nxtwave.tech", // 🔁 replace with your real Vercel URL
     ],
     methods: ["GET", "POST"],
   }),
