@@ -3,7 +3,17 @@
  * Provides a structured way to interact with the backend services.
  */
 
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5050";
+const isLocalhost = Boolean(
+  window.location.hostname === "localhost" ||
+    window.location.hostname === "[::1]" ||
+    window.location.hostname.match(
+      /^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/
+    )
+);
+
+const API_URL = isLocalhost
+  ? "http://localhost:5050"
+  : "https://smart-companion-5znk.onrender.com";
 
 /**
  * Helper to retrieve the JWT token from local storage and format it for the Authorization header.

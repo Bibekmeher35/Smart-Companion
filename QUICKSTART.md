@@ -27,7 +27,7 @@ JWT_SECRET=change-this-to-random-string
 
 **Frontend** (`frontend/.env`):
 ```env
-REACT_APP_API_URL=http://localhost:5050
+REACT_APP_API_URL=https://smart-companion-5znk.onrender.com
 ```
 
 ### Step 3: Install Dependencies

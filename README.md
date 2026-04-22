@@ -238,7 +238,7 @@ MONGODB_URI=mongodb://localhost:27017/smart-companion
 JWT_SECRET=your-super-secret-jwt-key-change-this
 ```
 
-Create `.env` file in `frontend/`:
+Create `.env` file in `frontend/` (Optional, as the app now auto-detects environment):
 
 ```env
 REACT_APP_API_URL=http://localhost:5050
@@ -369,7 +369,7 @@ Backend requires separate deployment.
 - Backend unreachable?  
   - Ensure `node index.js` is running  
   - Check MongoDB connection  
-  - Confirm URL: `http://localhost:5050/decompose`  
+  - Confirm URL: `https://smart-companion-5znk.onrender.com/decompose`  
 
 - Gemini API errors?  
   - Check `.env` file  
