@@ -1,58 +1,63 @@
-// storage.js
-
-const USERS_KEY = "SMART_COMPANION_USERS";
+/**
+ * Local Storage Utility Functions.
+ * Manages persistent storage of authentication tokens and user session data in the browser.
+ */
 
 /**
- * Get all users safely
+ * Saves the authentication token to localStorage.
  */
-function getAllUsers() {
-  const stored = localStorage.getItem(USERS_KEY);
+export function saveToken(token) {
+  localStorage.setItem("authToken", token);
+}
 
-  if (!stored) return {};
+/**
+ * Retrieves the authentication token from localStorage.
+ */
+export function getToken() {
+  return localStorage.getItem("authToken");
+}
 
+/**
+ * Removes the authentication token from localStorage.
+ */
+export function removeToken() {
+  localStorage.removeItem("authToken");
+}
+
+/**
+ * Saves the current user's session data to localStorage.
+ */
+export function saveUser(username, userData) {
+  localStorage.setItem("currentUser", JSON.stringify({ username, userData }));
+}
+
+/**
+ * Loads the stored user session data from localStorage.
+ * Handles JSON parsing and potential corruption by clearing the entry if invalid.
+ */
+export function loadUser() {
+  const stored = localStorage.getItem("currentUser");
+  if (!stored) return null;
+  
   try {
     return JSON.parse(stored);
   } catch (err) {
-    console.error("Corrupted users storage. Resetting...");
-    localStorage.removeItem(USERS_KEY);
-    return {};
+    console.error("Corrupted user storage. Resetting...");
+    localStorage.removeItem("currentUser");
+    return null;
   }
 }
 
 /**
- * Save a single user
+ * Removes the stored user session data from localStorage.
  */
-export function saveUser(username, userData) {
-  const users = getAllUsers();
-
-  users[username] = userData;
-
-  localStorage.setItem(USERS_KEY, JSON.stringify(users));
+export function removeUser() {
+  localStorage.removeItem("currentUser");
 }
 
 /**
- * Load a single user
- */
-export function loadUser(username) {
-  const users = getAllUsers();
-  return users[username] || null;
-}
-
-/**
- * (Optional) Remove user – useful for logout/testing
- */
-export function removeUser(username) {
-  const users = getAllUsers();
-
-  if (users[username]) {
-    delete users[username];
-    localStorage.setItem(USERS_KEY, JSON.stringify(users));
-  }
-}
-
-/**
- * (Optional) Clear everything – DEV ONLY
+ * Clears all data from localStorage.
  */
 export function clearAllUsers() {
-  localStorage.removeItem(USERS_KEY);
+  localStorage.clear();
 }

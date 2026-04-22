@@ -1,5 +1,10 @@
 import React, { useState } from "react";
 
+/**
+ * TaskPage Component.
+ * The core interaction area where users input a task, watch it get decomposed by AI,
+ * and then follow the generated steps one-by-one.
+ */
 export default function TaskPage({
   task,
   setTask,
@@ -13,13 +18,20 @@ export default function TaskPage({
 }) {
   const [loading, setLoading] = useState(false);
 
+  // Helper to identify if the user is on the final step of the decomposition
   const isLastStep = steps.length > 0 && currentIndex === steps.length - 1;
 
+  /**
+   * Advances the user to the next step.
+   * If it's the last step, the markDone call (in App.js) will trigger taskFinished.
+   */
   const handleMarkDone = () => {
-    // App will set taskFinished to true when the last step is completed
     markDone();
   };
 
+  /**
+   * Finalizes the task session, resets states, and navigates back to the dashboard.
+   */
   const handleFinish = () => {
     if (resetTaskSession) {
       resetTaskSession();
@@ -28,6 +40,7 @@ export default function TaskPage({
       onBack();
     }
   };
+
   return (
     <div
       className="task-page"
@@ -42,6 +55,7 @@ export default function TaskPage({
     >
       <h2 style={{ marginBottom: "20px" }}>Task Decomposition</h2>
 
+      {/* Input Section: Where the user defines the goal */}
       <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
         <input
           value={task}
@@ -58,7 +72,7 @@ export default function TaskPage({
           onClick={async () => {
             if (!task.trim()) return;
             setLoading(true);
-            await sendTask();
+            await sendTask(); // Triggers the backend AI call
             setLoading(false);
           }}
           disabled={loading}
@@ -90,6 +104,7 @@ export default function TaskPage({
         </button>
       </div>
 
+      {/* Loading Hint: Informs user about the expected wait time for AI */}
       {loading && (
         <div
           style={{
@@ -110,6 +125,7 @@ export default function TaskPage({
         </div>
       )}
 
+      {/* Step-by-Step Viewer: Displays one step at a time */}
       {steps.length > 0 && !taskFinished && (
         <div
           style={{
@@ -141,6 +157,7 @@ export default function TaskPage({
         </div>
       )}
 
+      {/* Success View: Displayed once all steps are marked done */}
       {taskFinished && (
         <div
           style={{
@@ -173,6 +190,8 @@ export default function TaskPage({
           </button>
         </div>
       )}
+
+      {/* CSS Keyframes for Spinner and Animations */}
       <style>
         {`
           @keyframes spin {
@@ -188,3 +207,4 @@ export default function TaskPage({
     </div>
   );
 }
+

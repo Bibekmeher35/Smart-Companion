@@ -1,26 +1,49 @@
+/**
+ * Main entry point for the Smart Companion Backend.
+ * Handles server initialization, middleware configuration, and core API logic.
+ */
+
 import express from "express";
 import cors from "cors";
 import { sanitize } from "./sanitize.js";
 import dotenv from "dotenv";
+import { connectDB } from "./config/db.js";
+import authRoutes from "./routes/auth.js";
+import { authenticateToken } from "./middleware/auth.js";
 
+// Load environment variables from .env file
 dotenv.config();
+
+// Establish connection to MongoDB database
+connectDB();
 
 const app = express();
 
-/* ✅ Proper CORS for Production */
+/**
+ * Configure Cross-Origin Resource Sharing (CORS).
+ * Defines allowed origins, methods, and headers to secure the API for production and local development.
+ */
 app.use(
   cors({
     origin: [
       "http://localhost:3000",
       "https://smart-companion-beta.vercel.app",
-      "https://bibekg62rtrjsivganup.drops.nxtwave.tech", // 🔁 replace with your real Vercel URL
+      "https://bibekg62rtrjsivganup.drops.nxtwave.tech",
     ],
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization"],
   }),
 );
 
+// Middleware to parse incoming JSON request bodies
 app.use(express.json());
 
+/**
+ * Helper function to interact with the Google Gemini AI API.
+ * @param {string} prompt - The text prompt to send to the AI model.
+ * @returns {Promise<string>} - The generated text response from the AI.
+ */
 async function callGemini(prompt) {
   const response = await fetch(
     `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
@@ -45,23 +68,35 @@ async function callGemini(prompt) {
   return data.candidates[0].content.parts[0].text;
 }
 
-/* ✅ Health Check Route */
+/**
+ * Health check route to verify if the server is running.
+ */
 app.get("/", (req, res) => {
   res.send("Smart Companion Backend Running");
 });
 
-/* ✅ Main API */
-app.post("/decompose", async (req, res) => {
+// Authentication routes (Login, Signup, etc.)
+app.use("/api/auth", authRoutes);
+
+/**
+ * Main decomposition API route.
+ * Takes a complex task and breaks it down into simple, manageable steps using AI.
+ * Requires a valid authentication token.
+ */
+app.post("/decompose", authenticateToken, async (req, res) => {
   try {
+    // Sanitize input to prevent injection attacks and clean the task description
     const cleanTask = sanitize(req.body.task);
     const profile = req.body.profile || {};
 
+    // Define rules based on the user's preferred step detail level
     const stepRules = {
       low: "Break the task into 3–4 high-level steps.",
       medium: "Break the task into 5–7 clear steps.",
       high: "Break the task into very small, concrete micro-steps (8–12 steps).",
     };
 
+    // Construct the prompt for the AI, incorporating neuro-inclusive guidelines
     const prompt = `
 You are a neuro-inclusive task assistant.
 
@@ -84,8 +119,10 @@ ${stepRules[profile.stepLevel] || stepRules["medium"]}
 Return ONLY the steps, each on a new line.
 `;
 
+    // Fetch steps from Gemini AI
     const text = await callGemini(prompt);
 
+    // Process the text to clean up step numbering and empty lines
     const steps = text
       .split("\n")
       .map((s) => s.replace(/^\d+[.)\s]*/, "").trim())
@@ -95,6 +132,7 @@ Return ONLY the steps, each on a new line.
   } catch (error) {
     console.error("Gemini unavailable, using fallback:", error.message);
 
+    // Fallback static steps in case the AI service is unreachable
     return res.json({
       steps: [
         "Pick up items from the floor",
@@ -107,9 +145,12 @@ Return ONLY the steps, each on a new line.
   }
 });
 
-/* ✅ CRITICAL FIX FOR RENDER */
+/**
+ * Start the server on the specified port.
+ */
 const PORT = process.env.PORT || 5050;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+

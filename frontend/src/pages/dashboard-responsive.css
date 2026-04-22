@@ -1,0 +1,372 @@
+/* Responsive Enhancements for Smart Companion */
+
+/* Root with overflow control */
+.dashboard-root {
+  overflow-x: hidden;
+}
+
+/* Main with flexible padding */
+.dashboard-main {
+  padding: clamp(16px, 3vw, 40px);
+  overflow-x: hidden;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Topbar responsive */
+.topbar {
+  gap: clamp(8px, 2vw, 16px);
+  padding: clamp(12px, 2vh, 16px) 0;
+  margin-bottom: clamp(12px, 2vh, 20px);
+}
+
+.topbar-greeting {
+  font-size: clamp(1.2rem, 3vw, 1.6rem);
+}
+
+.topbar-title p {
+  font-size: clamp(0.8rem, 1.5vw, 0.95rem);
+  margin: 4px 0 0;
+  color: #6b7280;
+}
+
+/* Mobile menu button */
+.mobile-menu-btn {
+  width: clamp(36px, 8vw, 40px);
+  height: clamp(36px, 8vw, 40px);
+  font-size: clamp(18px, 4vw, 22px);
+}
+
+/* Top actions */
+.top-actions {
+  gap: clamp(8px, 1.5vw, 12px);
+  flex-wrap: nowrap;
+}
+
+@media (max-width: 768px) {
+  .top-actions {
+    flex-wrap: wrap;
+  }
+}
+
+.top-icon {
+  width: clamp(36px, 8vw, 40px);
+  height: clamp(36px, 8vw, 40px);
+  font-size: clamp(16px, 3.5vw, 18px);
+  flex-shrink: 0;
+}
+
+/* Stats responsive */
+.stats {
+  grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
+  gap: clamp(12px, 2vw, 16px);
+  margin: clamp(16px, 3vh, 24px) 0;
+}
+
+.stat {
+  padding: clamp(12px, 2vw, 16px);
+  font-size: clamp(0.85rem, 1.5vw, 1rem);
+  min-width: 0;
+}
+
+.stat b {
+  display: block;
+  margin-top: 8px;
+  font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+}
+
+/* Grid responsive */
+.grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+  gap: clamp(16px, 2.5vw, 24px);
+}
+
+.grid-left {
+  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+  gap: clamp(16px, 2.5vw, 24px);
+}
+
+.grid-left .wide {
+  grid-column: 1 / -1;
+}
+
+/* Cards responsive */
+.card {
+  padding: clamp(12px, 2vw, 16px);
+  overflow: hidden;
+}
+
+.card h4 {
+  font-size: clamp(0.95rem, 2vw, 1.1rem);
+  margin: 0 0 clamp(8px, 1.5vh, 12px);
+}
+
+/* Settings section */
+.settings-section {
+  margin-top: clamp(16px, 3vh, 24px);
+  grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+  gap: clamp(16px, 2.5vw, 20px);
+}
+
+.settings-card h4 {
+  font-size: clamp(1rem, 2vw, 1.15rem);
+}
+
+/* Profile row */
+.profile-row {
+  flex-wrap: wrap;
+  gap: clamp(12px, 2vw, 16px);
+}
+
+.profile-label {
+  font-size: clamp(0.85rem, 1.5vw, 0.9rem);
+  flex: 1 1 auto;
+  min-width: 120px;
+}
+
+.profile-select {
+  min-width: min(200px, 100%);
+  max-width: 100%;
+  padding: clamp(6px, 1vw, 8px) clamp(8px, 1.5vw, 10px);
+  font-size: clamp(0.85rem, 1.5vw, 0.95rem);
+  flex: 0 1 auto;
+}
+
+/* Analytics responsive */
+.analytics-page,
+.charts-page {
+  margin-top: clamp(8px, 1.5vh, 12px);
+}
+
+.analytics-header,
+.charts-header {
+  flex-wrap: wrap;
+  gap: clamp(12px, 2vw, 16px);
+  margin-bottom: clamp(12px, 2vh, 16px);
+}
+
+.analytics-title,
+.charts-title {
+  font-size: clamp(1.2rem, 3vw, 1.35rem);
+}
+
+.analytics-subtitle,
+.charts-subtitle {
+  font-size: clamp(0.8rem, 1.5vw, 0.9rem);
+}
+
+.analytics-metrics {
+  grid-template-columns: repeat(auto-fit, minmax(min(160px, 100%), 1fr));
+  gap: clamp(12px, 2vw, 14px);
+  margin-bottom: clamp(14px, 2.5vh, 18px);
+}
+
+.analytics-metric {
+  padding: clamp(12px, 2vw, 16px);
+  min-width: 0;
+}
+
+.analytics-metric-label {
+  font-size: clamp(0.75rem, 1.3vw, 0.8rem);
+}
+
+.analytics-metric-value {
+  margin-top: clamp(6px, 1vh, 8px);
+  font-size: clamp(1.1rem, 2.5vw, 1.25rem);
+  word-break: break-word;
+}
+
+.analytics-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+  gap: clamp(16px, 2.5vw, 20px);
+}
+
+.charts-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+  gap: clamp(16px, 2.5vw, 20px);
+}
+
+.charts-card {
+  min-width: 0;
+}
+
+.charts-card.wide {
+  grid-column: 1 / -1;
+}
+
+/* Search bar responsive */
+.search-bar-wrapper {
+  min-width: min(240px, 100%);
+}
+
+.search-bar-input {
+  padding: clamp(8px, 1.5vw, 10px) clamp(12px, 2vw, 16px);
+  padding-right: clamp(50px, 10vw, 60px);
+  font-size: clamp(0.8rem, 1.5vw, 0.875rem);
+  height: clamp(36px, 8vw, 40px);
+}
+
+.search-bar-kbd {
+  right: clamp(8px, 1.5vw, 12px);
+  padding: clamp(3px, 0.5vw, 4px) clamp(6px, 1vw, 8px);
+  font-size: clamp(0.7rem, 1.2vw, 0.75rem);
+}
+
+/* Profile dropdown */
+.profile-dropdown {
+  top: clamp(52px, 10vh, 56px);
+  width: min(320px, calc(100vw - 32px));
+  padding: clamp(14px, 2vw, 18px);
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+}
+
+/* Desktop enhancements */
+@media (min-width: 992px) {
+  .stats {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  .grid {
+    grid-template-columns: 2fr 1fr;
+  }
+  
+  .grid-left {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .grid-left .wide {
+    grid-column: span 2;
+  }
+  
+  .analytics-metrics {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  .analytics-grid {
+    grid-template-columns: 1.2fr 1fr;
+  }
+  
+  .charts-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .charts-card.wide {
+    grid-column: span 2;
+  }
+  
+  .settings-section {
+    grid-template-columns: 1.2fr 1fr;
+  }
+}
+
+/* Tablet breakpoint */
+@media (max-width: 991px) and (min-width: 769px) {
+  .dashboard-main {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+  
+  .sidebar {
+    width: 260px;
+    transform: translateX(-100%);
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  
+  .mobile-menu-btn {
+    display: inline-flex;
+  }
+
+  .sidebar-backdrop {
+    display: block;
+  }
+  
+  .stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .analytics-metrics {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Mobile enhancements */
+@media (max-width: 768px) {
+  .dashboard-main {
+    padding: clamp(12px, 3vw, 16px);
+  }
+  
+  .topbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .topbar-title {
+    width: 100%;
+  }
+  
+  .top-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .search-bar-wrapper {
+    flex: 1;
+    min-width: 0;
+    max-width: none;
+  }
+  
+  .profile-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .profile-select {
+    width: 100%;
+    min-width: 100%;
+  }
+  
+  .grid-left .wide {
+    grid-column: 1;
+  }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+  .topbar-greeting {
+    font-size: clamp(1rem, 5vw, 1.2rem);
+  }
+  
+  .analytics-metrics {
+    grid-template-columns: 1fr;
+  }
+  
+  .stat {
+    text-align: center;
+  }
+  
+  .profile-dropdown {
+    left: 16px;
+    right: 16px;
+    width: auto;
+  }
+}
+
+/* High zoom / Accessibility */
+* {
+  box-sizing: border-box;
+}
+
+img, svg, video, canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+button, input, select, textarea {
+  font-size: inherit;
+}

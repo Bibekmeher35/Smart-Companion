@@ -1,12 +1,15 @@
 import "./dashboard.css";
+import "./dashboard-responsive.css";
 import Calendar from "../components/Calendar";
 import TasksChart from "../components/TasksChart";
 import TaskPage from "./TaskPage";
 import ProfileSettings from "./ProfileSettings";
 import AnalyticsPage from "./AnalyticsPage";
 import ChartsPage from "./ChartsPage";
-import { loadUser, saveUser } from "../utils/storage";
-import bcrypt from "bcryptjs";
+import { saveUser } from "../utils/storage";
+import { authAPI } from "../utils/api";
+import TodoList from "../components/TodoList";
+import SearchModal from "../components/SearchModal";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   MdHome,
@@ -17,8 +20,14 @@ import {
   MdSettings,
   MdLogout,
   MdSmartToy,
+  MdNotifications,
+  MdAccountCircle,
 } from "react-icons/md";
 
+/**
+ * ChangePasswordSection Component.
+ * Handles the logic and UI for updating the user's password.
+ */
 function ChangePasswordSection({ username }) {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -56,27 +65,9 @@ function ChangePasswordSection({ username }) {
       return;
     }
 
-    const user = loadUser(username);
-    if (!user || !user.passwordHash) {
-      setStatus({
-        type: "error",
-        message: "Could not find this user in storage.",
-      });
-      return;
-    }
-
     try {
       setLoading(true);
-      const isValid = await bcrypt.compare(currentPassword, user.passwordHash);
-      if (!isValid) {
-        setStatus({ type: "error", message: "Current password is incorrect." });
-        setLoading(false);
-        return;
-      }
-
-      const nextHash = await bcrypt.hash(newPassword, 10);
-      const updatedUser = { ...user, passwordHash: nextHash };
-      saveUser(username, updatedUser);
+      await authAPI.updatePassword(currentPassword, newPassword);
 
       setStatus({
         type: "success",
@@ -89,7 +80,7 @@ function ChangePasswordSection({ username }) {
       console.error(err);
       setStatus({
         type: "error",
-        message: "Something went wrong while updating password.",
+        message: err.message || "Something went wrong while updating password.",
       });
     } finally {
       setLoading(false);
@@ -154,11 +145,20 @@ function ChangePasswordSection({ username }) {
   );
 }
 
+/**
+ * DashboardLayout Component.
+ * The primary layout wrapper that provides navigation (sidebar), header (topbar),
+ * and dynamically renders content based on the selected menu item.
+ */
 export default function DashboardLayout({
   username,
   progress,
   history = [],
   profile,
+  todos = [],
+  onAddTodo,
+  onToggleTodo,
+  onDeleteTodo,
   updateProfile,
   onLogout,
   task,
@@ -170,24 +170,47 @@ export default function DashboardLayout({
   taskFinished,
   resetTaskSession,
 }) {
+  // --- Sidebar & Navigation State ---
   const [sidebarOpen, setSidebarOpen] = useState(() => {
     if (typeof window === "undefined") return true;
-    return window.innerWidth >= 992;
+    return window.innerWidth >= 992; // Default open on large screens
   });
 
-  const [activeItem, setActiveItem] = useState("dashboard");
-  const [now, setNow] = useState(() => new Date());
-  const [showProfilePanel, setShowProfilePanel] = useState(false);
-  const profileDropdownRef = useRef(null);
+  const [activeItem, setActiveItem] = useState("dashboard"); // Controls which page is displayed
+  const [now, setNow] = useState(() => new Date()); // Drives the real-time clock in the header
+  const [showProfilePanel, setShowProfilePanel] = useState(false); // Profile dropdown visibility
+  const [showSearchModal, setShowSearchModal] = useState(false); // Global search modal visibility
+  const profileDropdownRef = useRef(null); // Ref for handling clicks outside the profile panel
 
   const tasksCompleted = progress?.tasksCompleted || 0;
 
+  /**
+   * Effect: Real-time clock tick every minute.
+   */
   useEffect(() => {
     const tick = () => setNow(new Date());
     const id = window.setInterval(tick, 60 * 1000);
     return () => window.clearInterval(id);
   }, []);
 
+  /**
+   * Effect: Global Shortcut for Search (CMD+K or CTRL+K).
+   */
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setShowSearchModal(true);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  /**
+   * Effect: Close profile panel when clicking outside.
+   */
   useEffect(() => {
     if (!showProfilePanel) return;
 
@@ -206,6 +229,10 @@ export default function DashboardLayout({
     };
   }, [showProfilePanel]);
 
+  /**
+   * Memoized Value: Recent History Labels
+   * Formats the last 3 tasks for display in the dashboard summary.
+   */
   const recentHistory = useMemo(() => {
     if (!Array.isArray(history) || history.length === 0) return [];
     const lastThree = history.slice(-3);
@@ -224,6 +251,9 @@ export default function DashboardLayout({
     });
   }, [history, tasksCompleted]);
 
+  /**
+   * Memoized Value: Formatted Time Label for Topbar.
+   */
   const nowLabel = useMemo(() => {
     return now.toLocaleString(undefined, {
       hour: "2-digit",
@@ -234,6 +264,9 @@ export default function DashboardLayout({
     });
   }, [now]);
 
+  /**
+   * Memoized Value: Contextual Greeting based on time of day.
+   */
   const greeting = useMemo(() => {
     const hour = now.getHours();
     if (hour >= 5 && hour < 12) return "Good Morning";
@@ -246,115 +279,114 @@ export default function DashboardLayout({
 
   return (
     <div className="dashboard-root">
-      {
-        <aside className={`sidebar ${sidebarOpen ? "open" : "closed"}`}>
-          <div className="sidebar-header">
-            <div className="brand">
-              <span className="brand-logo">
-                <MdSmartToy />
-              </span>
-              {sidebarOpen && (
-                <span className="brand-text">Smart Companion</span>
-              )}
-            </div>
-            <button
-              className="sidebar-toggle"
-              onClick={() => setSidebarOpen((prev) => !prev)}
-            >
-              {sidebarOpen ? "«" : "»"}
-            </button>
+      {/* Sidebar Navigation */}
+      <aside className={`sidebar ${sidebarOpen ? "open" : "closed"}`}>
+        <div className="sidebar-header">
+          <div className="brand">
+            <span className="brand-logo">
+              <MdSmartToy />
+            </span>
+            {sidebarOpen && (
+              <span className="brand-text">Smart Companion</span>
+            )}
           </div>
+          <button
+            className="sidebar-toggle"
+            onClick={() => setSidebarOpen((prev) => !prev)}
+          >
+            {sidebarOpen ? "«" : "»"}
+          </button>
+        </div>
 
-          <nav className="sideList">
-            <button
-              className={`nav-item nav-item-home ${
-                activeItem === "dashboard" ? "active" : ""
-              }`}
-              onClick={() => {
-                setShowProfilePanel(false);
-                setActiveItem("dashboard");
-              }}
-            >
-              <span className="nav-icon">
-                <MdHome />
-              </span>
-              <span className="nav-label">Home</span>
-            </button>
+        <nav className="sideList">
+          <button
+            className={`nav-item nav-item-home ${
+              activeItem === "dashboard" ? "active" : ""
+            }`}
+            onClick={() => {
+              setShowProfilePanel(false);
+              setActiveItem("dashboard");
+            }}
+          >
+            <span className="nav-icon">
+              <MdHome />
+            </span>
+            <span className="nav-label">Home</span>
+          </button>
 
-            <button
-              className={`nav-item nav-item-task ${
-                activeItem === "task" ? "active" : ""
-              }`}
-              onClick={() => {
-                setShowProfilePanel(false);
-                setActiveItem("task");
-              }}
-            >
-              <span className="nav-icon">
-                <MdChecklist />
-              </span>
-              <span className="nav-label">Task</span>
-            </button>
+          <button
+            className={`nav-item nav-item-task ${
+              activeItem === "task" ? "active" : ""
+            }`}
+            onClick={() => {
+              setShowProfilePanel(false);
+              setActiveItem("task");
+            }}
+          >
+            <span className="nav-icon">
+              <MdChecklist />
+            </span>
+            <span className="nav-label">Task</span>
+          </button>
 
-            <button
-              className={`nav-item nav-item-analytics ${
-                activeItem === "analytics" ? "active" : ""
-              }`}
-              onClick={() => {
-                setShowProfilePanel(false);
-                setActiveItem("analytics");
-              }}
-            >
-              <span className="nav-icon">
-                <MdInsights />
-              </span>
-              <span className="nav-label">Analytics</span>
-            </button>
-            <button
-              className={`nav-item nav-item-charts ${
-                activeItem === "charts" ? "active" : ""
-              }`}
-              onClick={() => {
-                setShowProfilePanel(false);
-                setActiveItem("charts");
-              }}
-            >
-              <span className="nav-icon">
-                <MdShowChart />
-              </span>
-              <span className="nav-label">Charts</span>
-            </button>
-            <button
-              className={`nav-item nav-item-settings ${
-                activeItem === "settings" ? "active" : ""
-              }`}
-              onClick={() => {
-                setShowProfilePanel(false);
-                setActiveItem("settings");
-              }}
-            >
-              <span className="nav-icon">
-                <MdSettings />
-              </span>
-              <span className="nav-label">Settings</span>
-            </button>
-          </nav>
+          <button
+            className={`nav-item nav-item-analytics ${
+              activeItem === "analytics" ? "active" : ""
+            }`}
+            onClick={() => {
+              setShowProfilePanel(false);
+              setActiveItem("analytics");
+            }}
+          >
+            <span className="nav-icon">
+              <MdInsights />
+            </span>
+            <span className="nav-label">Analytics</span>
+          </button>
+          <button
+            className={`nav-item nav-item-charts ${
+              activeItem === "charts" ? "active" : ""
+            }`}
+            onClick={() => {
+              setShowProfilePanel(false);
+              setActiveItem("charts");
+            }}
+          >
+            <span className="nav-icon">
+              <MdShowChart />
+            </span>
+            <span className="nav-label">Charts</span>
+          </button>
+          <button
+            className={`nav-item nav-item-settings ${
+              activeItem === "settings" ? "active" : ""
+            }`}
+            onClick={() => {
+              setShowProfilePanel(false);
+              setActiveItem("settings");
+            }}
+          >
+            <span className="nav-icon">
+              <MdSettings />
+            </span>
+            <span className="nav-label">Settings</span>
+          </button>
+        </nav>
 
-          <div className="sideFull">
-            <button
-              className="logout"
-              onClick={() => {
-                if (onLogout) onLogout();
-              }}
-            >
-              <span className="logout-icon">
-                <MdLogout />
-              </span>
-              <span className="logout-label">Log out</span>
-            </button>
-          </div>
-        </aside>
-      }
+        <div className="sideFull">
+          <button
+            className="logout"
+            onClick={() => {
+              if (onLogout) onLogout();
+            }}
+          >
+            <span className="logout-icon">
+              <MdLogout />
+            </span>
+            <span className="logout-label">Log out</span>
+          </button>
+        </div>
+      </aside>
 
       {sidebarOpen && (
         <button
@@ -368,11 +400,12 @@ export default function DashboardLayout({
       <main
         className="dashboard-main"
         style={{
-          marginLeft: sidebarOpen ? "236px" : "72px",
-          width: sidebarOpen ? "calc(100% - 236px)" : "calc(100% - 72px)",
-          transition: "margin-left 0.3s ease, width 0.3s ease",
+          marginLeft: sidebarOpen ? "236px" : "80px",
+          width: sidebarOpen ? "calc(100% - 236px)" : "calc(100% - 80px)",
+          transition: "margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1), width 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
         }}
       >
+        {/* Topbar: Branding, Search, and Profile Actions */}
         <header className="topbar">
           <button
             type="button"
@@ -385,22 +418,37 @@ export default function DashboardLayout({
 
           <div className="topbar-title">
             <h1 className="topbar-greeting">
-              {greeting},{" "}
-              <span className="topbar-username">{displayName}</span>
+              {greeting}, <span className="topbar-username">{displayName}</span>
             </h1>
             <p>{nowLabel}</p>
           </div>
 
           <div className="top-actions">
-            <input placeholder="Search" />
+            {/* Search Input (Triggers Modal) */}
+            <div
+              className="search-bar-wrapper"
+              onClick={() => setShowSearchModal(true)}
+            >
+              <input
+                placeholder="Search..."
+                readOnly
+                className="search-bar-input"
+              />
+              <kbd className="search-bar-kbd">⌘K</kbd>
+            </div>
+            
             <button
               type="button"
               className="top-icon top-icon-notification"
               aria-label="Notifications"
-              onClick={() => setShowProfilePanel(false)}
+              onClick={() => {
+                setShowProfilePanel(false);
+                alert("In development");
+              }}
             >
-              🔔
+              <MdNotifications />
             </button>
+            
             <button
               type="button"
               className="top-icon top-icon-profile"
@@ -408,7 +456,7 @@ export default function DashboardLayout({
               aria-expanded={showProfilePanel}
               onClick={() => setShowProfilePanel((prev) => !prev)}
             >
-              👤
+              <MdAccountCircle />
             </button>
           </div>
         </header>
@@ -419,8 +467,7 @@ export default function DashboardLayout({
               <div>
                 <div className="profile-summary-name">{displayName}</div>
                 <div className="profile-summary-meta">
-                  Tasks completed:{" "}
-                  <span>{progress?.tasksCompleted || 0}</span>
+                  Tasks completed: <span>{progress?.tasksCompleted || 0}</span>
                 </div>
               </div>
               <button
@@ -436,7 +483,10 @@ export default function DashboardLayout({
           </div>
         )}
 
+        {/* --- Main Content Routing --- */}
+        
         {activeItem === "task" ? (
+          // Task Decomposition & Execution View
           <TaskPage
             task={task}
             setTask={setTask}
@@ -449,24 +499,24 @@ export default function DashboardLayout({
             onBack={() => setActiveItem("dashboard")}
           />
         ) : activeItem === "analytics" ? (
+          // Detailed Productivity Analytics
           <AnalyticsPage
             username={username}
             progress={progress || {}}
             history={history || []}
           />
         ) : activeItem === "charts" ? (
+          // Visual Charts & Historical Trends
           <ChartsPage progress={progress || {}} history={history || []} />
         ) : activeItem === "settings" ? (
+          // User Profile & App Preferences
           <section className="settings-section">
             <div className="card settings-card">
               <h4>Profile & Preferences</h4>
               <p className="settings-subtitle">
                 Tune how Smart Companion breaks down your tasks.
               </p>
-              <ProfileSettings
-                profile={profile || {}}
-                onSave={updateProfile}
-              />
+              <ProfileSettings profile={profile || {}} onSave={updateProfile} />
             </div>
 
             <div className="card settings-card">
@@ -480,15 +530,16 @@ export default function DashboardLayout({
                   Username: <span>{username || "Unknown"}</span>
                 </div>
                 <div className="profile-summary-meta">
-                  Tasks completed:{" "}
-                  <span>{progress?.tasksCompleted || 0}</span>
+                  Tasks completed: <span>{progress?.tasksCompleted || 0}</span>
                 </div>
               </div>
               <ChangePasswordSection username={username} />
             </div>
           </section>
         ) : (
+          // Default Dashboard (Home) View
           <>
+            {/* Rapid Stat Overview */}
             <section className="stats">
               <div className="stat green">
                 Points <b>{progress?.tasksCompleted * 10 || 0}</b>
@@ -509,42 +560,24 @@ export default function DashboardLayout({
 
             <section className="grid">
               <div className="grid-left">
+                {/* To-do List Card */}
                 <div className="card wide">
-                  <h4>To‑do Lists</h4>
-                  {recentHistory.length > 0 ? (
-                    <>
-                      <TasksChart history={recentHistory} />
-                      <ul className="history-list">
-                        {recentHistory
-                          .slice()
-                          .reverse()
-                          .map((item, idx) => (
-                            <li key={idx}>
-                              <span className="history-title">
-                                {item.label}
-                              </span>
-                              {item.completedAt && (
-                                <span className="history-date">
-                                  {new Date(
-                                    item.completedAt,
-                                  ).toLocaleDateString()}
-                                </span>
-                              )}
-                            </li>
-                          ))}
-                      </ul>
-                    </>
-                  ) : (
-                    <p>Manage your structured micro‑tasks efficiently.</p>
-                  )}
+                  <TodoList
+                    todos={todos}
+                    onAddTodo={onAddTodo}
+                    onToggleTodo={onToggleTodo}
+                    onDeleteTodo={onDeleteTodo}
+                  />
                 </div>
 
+                {/* Progress Chart Card */}
                 <div className="card wide">
                   <h4>Tasks Completed</h4>
                   <TasksChart total={progress?.tasksCompleted || 0} />
                 </div>
               </div>
 
+              {/* Monthly Activity Calendar */}
               <div className="card calendar">
                 <h4 style={{ textAlign: "center" }}>Calendar</h4>
                 <Calendar completedDates={progress?.completedDates || []} />
@@ -553,6 +586,17 @@ export default function DashboardLayout({
           </>
         )}
       </main>
+
+      <SearchModal
+        isOpen={showSearchModal}
+        onClose={() => setShowSearchModal(false)}
+        history={history}
+        todos={todos}
+        onNavigate={(item) => {
+          setShowSearchModal(false);
+          // Handle navigation based on item type
+        }}
+      />
     </div>
   );
 }

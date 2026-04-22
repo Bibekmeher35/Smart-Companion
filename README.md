@@ -1,11 +1,11 @@
 # 🧠 Smart Companion  
-![Build Status](https://img.shields.io/badge/build-passing-brightgreen) ![License](https://img.shields.io/badge/license-MIT-blue) ![Version](https://img.shields.io/badge/version-1.0.0-blue)
+![Build Status](https://img.shields.io/badge/build-passing-brightgreen) ![License](https://img.shields.io/badge/license-MIT-blue) ![Version](https://img.shields.io/badge/version-2.0.0-blue)
 
 ### Bridging the Executive Function Gap with Neuro-Inclusive AI
 
-Smart Companion is a **privacy-first full-stack web app** supporting neurodivergent individuals (Autism, ADHD, Dyslexia) by breaking overwhelming tasks into manageable micro-steps using AI.
+Smart Companion is a **full-stack web app with MongoDB database** supporting neurodivergent individuals (Autism, ADHD, Dyslexia) by breaking overwhelming tasks into manageable micro-steps using AI.
 
-Built with **React.js**, **Node.js**, and Google’s **Gemini API**, it delivers adaptive task decomposition tailored to cognitive preferences.
+Built with **React.js**, **Node.js**, **MongoDB**, and Google's **Gemini API**, it delivers adaptive task decomposition tailored to cognitive preferences.
 
 ---
 
@@ -32,7 +32,8 @@ Smart Companion offers:
 - ✅ Dyslexia-friendly UI mode  
 - ✅ Micro-step breakdown for clarity  
 - ✅ Progress tracking with rewards  
-- ✅ Privacy-first local data storage  
+- ✅ MongoDB database with JWT authentication  
+- ✅ Multi-device data synchronization  
 - ✅ Clean, Google-style login experience  
 
 ---
@@ -41,14 +42,23 @@ Smart Companion offers:
 
 ## 🔹 Frontend
 - React.js (Create React App)  
-- Privacy-first LocalStorage  
+- JWT token-based authentication  
 - Adaptive UI per neuro-profile  
 - Dashboard with charts & calendar  
 
 ## 🔹 Backend
 - Node.js & Express.js  
+- MongoDB database with Mongoose ODM  
+- JWT authentication middleware  
 - Gemini API (`@google/generative-ai`)  
 - Prompt-engineered adaptive responses  
+- bcrypt password hashing  
+
+## 🔹 Database
+- MongoDB for persistent user data  
+- User authentication and profiles  
+- Task history and progress tracking  
+- Multi-device data synchronization  
 
 ## 🔹 AI Layer
 - Constraint-based prompt tuning  
@@ -89,16 +99,16 @@ AI tailors output based on user profile.
 
 ---
 
-## 3️⃣ Privacy-Centric Architecture
+## 3️⃣ Secure Database Storage
 
-- No cloud database  
-- No unnecessary data sharing  
-- User accounts stored locally  
-- Passwords hashed with bcryptjs  
-- PIN-style data isolation  
-- Cognitive data never shared  
+- MongoDB for persistent data storage  
+- User accounts with JWT authentication  
+- Password hashing with bcryptjs  
+- Multi-device data synchronization  
+- Secure token-based sessions (7-day expiry)  
+- Protected API endpoints with middleware  
 
-All data is securely stored in the browser’s `localStorage`.
+All data is securely stored in MongoDB and accessible from any device.
 
 ---
 
@@ -125,9 +135,17 @@ All data is securely stored in the browser’s `localStorage`.
 ```
 smart-companion/
   backend/
-    index.js          # Express server + /decompose route
+    config/
+      db.js           # MongoDB connection
+    models/
+      User.js         # User schema
+    routes/
+      auth.js         # Authentication routes
+    middleware/
+      auth.js         # JWT middleware
+    index.js          # Express server
     package.json      # Backend dependencies
-    .env              # GEMINI_API_KEY (user-provided)
+    .env              # Environment variables
 
   frontend/
     src/
@@ -143,8 +161,10 @@ smart-companion/
         TasksChart.jsx
       utils/
         storage.js
+        api.js          # API service
 
     package.json      # Frontend dependencies & scripts
+    .env              # Frontend environment variables
 ```
 
 ---
@@ -153,13 +173,15 @@ smart-companion/
 
 1. **Node.js (LTS)** – https://nodejs.org  
 2. npm (bundled with Node.js)  
-3. Code editor (e.g., VS Code)  
+3. **MongoDB** – https://www.mongodb.com/try/download/community (or use MongoDB Atlas)  
+4. Code editor (e.g., VS Code)  
 
 Verify installations:
 
 ```bash
 node -v
 npm -v
+mongosh --version
 ```
 
 Obtain Gemini API Key:
@@ -172,6 +194,30 @@ Obtain Gemini API Key:
 
 # ⚙️ Setup & Running
 
+## 📦 MongoDB Setup
+
+**Option 1: Local MongoDB**
+```bash
+# macOS
+brew tap mongodb/brew
+brew install mongodb-community
+brew services start mongodb-community
+
+# Verify
+mongosh
+```
+
+**Option 2: MongoDB Atlas (Cloud)**
+1. Create free account at https://www.mongodb.com/cloud/atlas
+2. Create cluster and database user
+3. Get connection string
+
+**📖 Detailed MongoDB setup guide:** See [MONGODB_SETUP.md](MONGODB_SETUP.md)
+
+---
+
+## 📥 Install Dependencies
+
 From project root:
 
 ```bash
@@ -182,13 +228,23 @@ cd ../frontend
 npm install
 ```
 
+## 🔧 Configure Environment Variables
+
 Create `.env` file in `backend/`:
 
-```
-GEMINI_API_KEY=YOUR_KEY_HERE
+```env
+GEMINI_API_KEY=your-gemini-api-key-here
+MONGODB_URI=mongodb://localhost:27017/smart-companion
+JWT_SECRET=your-super-secret-jwt-key-change-this
 ```
 
-Restart backend after editing `.env`.
+Create `.env` file in `frontend/`:
+
+```env
+REACT_APP_API_URL=http://localhost:5050
+```
+
+Restart servers after editing `.env`.
 
 ---
 
@@ -202,7 +258,10 @@ node index.js
 ```
 
 Expected output:  
-`Server running on port 5050`
+```
+MongoDB Connected: localhost
+Server running on port 5050
+```
 
 ### 2️⃣ Frontend
 
@@ -222,11 +281,11 @@ Access app at:
 
 ## 🔐 Login / Create Account
 
-- Click “New user? Create account”  
+- Click "New user? Create account"  
 - Enter username and password  
 - Login  
 
-Each user’s data is isolated and stored locally.
+Your data is stored in MongoDB and accessible from any device.
 
 ---
 
@@ -235,7 +294,7 @@ Each user’s data is isolated and stored locally.
 Displays:
 
 - Points  
-- Today’s target  
+- Today's target  
 - Current streak  
 - Total tasks completed  
 - Recent task history (last 3)  
@@ -247,7 +306,7 @@ Displays:
 ## 📝 Task Page
 
 1. Select a task  
-2. Enter task description (e.g., “Prepare for exam”)  
+2. Enter task description (e.g., "Prepare for exam")  
 3. Click Generate  
 4. Follow steps:  
    - Mark as Done  
@@ -309,27 +368,33 @@ Backend requires separate deployment.
 
 - Backend unreachable?  
   - Ensure `node index.js` is running  
+  - Check MongoDB connection  
   - Confirm URL: `http://localhost:5050/decompose`  
 
 - Gemini API errors?  
   - Check `.env` file  
   - Restart backend  
 
-- Data lost?  
-  - Data stored in `localStorage`  
-  - Clearing browser storage deletes it  
+- MongoDB connection errors?  
+  - Verify MongoDB is running: `mongosh`  
+  - Check `MONGODB_URI` in `.env`  
+
+- Authentication errors?  
+  - Clear localStorage and login again  
+  - Check JWT_SECRET in `.env`  
 
 ---
 
 # 🚀 Future Improvements
 
-- Replace `localStorage` with real DB (MongoDB / Supabase)  
-- Add JWT authentication  
-- Integrate OAuth login  
+- Password reset via email  
+- OAuth login (Google/GitHub)  
+- Refresh token rotation  
 - Weekly productivity analytics  
 - Time tracking per step  
 - Mobile-first UI  
 - Enhanced accessibility fonts  
+- Admin dashboard  
 
 ---
 
@@ -339,9 +404,11 @@ This project covers:
 
 - Full-stack React + Node.js development  
 - REST API design  
+- MongoDB database integration  
+- JWT authentication  
 - AI API integration  
 - State management  
-- Local storage handling  
+- Secure password hashing  
 - Adaptive UI design  
 
 ---

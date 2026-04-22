@@ -1,17 +1,26 @@
 import { useState } from "react";
-import { loadUser, saveUser } from "../utils/storage";
-import bcrypt from "bcryptjs";
+import { saveToken, saveUser } from "../utils/storage";
+import { authAPI } from "../utils/api";
 import "./login.css";
 import { MdVisibility, MdVisibilityOff } from "react-icons/md";
 
+/**
+ * Login Component.
+ * Handles both user authentication (login) and registration (signup).
+ */
 export default function Login({ onLogin }) {
+  // --- UI State ---
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [isNewUser, setIsNewUser] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const [isNewUser, setIsNewUser] = useState(false); // Toggle between Login and Register modes
+  const [showPassword, setShowPassword] = useState(false); // Toggle password visibility
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  /**
+   * handleLogin: Centralized function for authentication.
+   * Based on 'isNewUser', it either calls the register or login API.
+   */
   const handleLogin = async () => {
     if (loading) return;
     setError("");
@@ -19,84 +28,54 @@ export default function Login({ onLogin }) {
     const u = username.trim();
     const p = password.trim();
 
+    // Validation
     if (!u || !p) {
       setError("Enter username and password.");
       return;
     }
 
-    const user = loadUser(u);
-
-    /* ================= CREATE ACCOUNT ================= */
-    if (isNewUser) {
-      if (user) {
-        setError("User already exists. Please login instead.");
-        return;
-      }
-
-      setLoading(true);
-
-      const passwordHash = await bcrypt.hash(p, 10);
-
-      const newUserData = {
-        passwordHash,
-        profile: {},
-        progress: {
-          tasksCompleted: 0,
-          currentStreak: 0,
-        },
-        rewards: [],
-        history: [],
-        createdAt: new Date().toISOString(),
-      };
-
-      saveUser(u, newUserData);
-
-      onLogin({
-        username: u,
-        authToken: passwordHash, // local demo token
-        userData: newUserData,
-      });
-
-      setLoading(false);
-      return;
-    }
-
-    /* ================= LOGIN ================= */
-    if (!user) {
-      setError("No user found with that username.");
-      return;
-    }
-
     setLoading(true);
 
-    const isValid = await bcrypt.compare(p, user.passwordHash);
+    try {
+      let response;
 
-    if (!isValid) {
-      setError("Wrong password. Please try again.");
+      // API Call: Register if new user, Login otherwise
+      if (isNewUser) {
+        response = await authAPI.register(u, p);
+      } else {
+        response = await authAPI.login(u, p);
+      }
+
+      // Persist credentials in local storage
+      saveToken(response.token);
+      saveUser(response.user.username, response.user);
+
+      // Notify parent component (App.js) of successful login
+      onLogin({
+        username: response.user.username,
+        authToken: response.token,
+        userData: response.user,
+      });
+    } catch (error) {
+      setError(error.message || "An error occurred");
+    } finally {
       setLoading(false);
-      return;
     }
-
-    onLogin({
-      username: u,
-      authToken: user.passwordHash,
-      userData: user,
-    });
-
-    setLoading(false);
   };
 
   return (
     <div className="login-root">
+      {/* Branding Section */}
       <div className="login-hero">
         <h1>Smart Companion</h1>
         <p>Turn big tasks into simple, guided steps.</p>
       </div>
 
+      {/* Form Section */}
       <div className="login-container">
         <h2>{isNewUser ? "Create your account" : "Welcome back"}</h2>
 
-        {/* Username */}
+        {/* Username Field */}
         <div className="input-group">
           <label>
             Username <span style={{ color: "red" }}>*</span>
@@ -109,7 +88,7 @@ export default function Login({ onLogin }) {
           />
         </div>
 
-        {/* Password */}
+        {/* Password Field with Visibility Toggle */}
         <div className="input-group password-group">
           <label>
             Password <span style={{ color: "red" }}>*</span>
@@ -135,9 +114,10 @@ export default function Login({ onLogin }) {
           </div>
         </div>
 
+        {/* Error Feedback */}
         {error && <div className="login-error">{error}</div>}
 
-        {/* Button */}
+        {/* Action Button */}
         <button
           id="login-btn"
           onClick={handleLogin}
@@ -153,7 +133,7 @@ export default function Login({ onLogin }) {
             : "Login"}
         </button>
 
-        {/* Toggle */}
+        {/* Auth Mode Toggle (Login <-> Register) */}
         <p className="login-toggle" onClick={() => setIsNewUser(!isNewUser)}>
           {isNewUser
             ? "Already have an account? Login"
