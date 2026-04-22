@@ -6,7 +6,6 @@ import TaskPage from "./TaskPage";
 import ProfileSettings from "./ProfileSettings";
 import AnalyticsPage from "./AnalyticsPage";
 import ChartsPage from "./ChartsPage";
-import { saveUser } from "../utils/storage";
 import { authAPI } from "../utils/api";
 import TodoList from "../components/TodoList";
 import SearchModal from "../components/SearchModal";
@@ -182,8 +181,6 @@ export default function DashboardLayout({
   const [showSearchModal, setShowSearchModal] = useState(false); // Global search modal visibility
   const profileDropdownRef = useRef(null); // Ref for handling clicks outside the profile panel
 
-  const tasksCompleted = progress?.tasksCompleted || 0;
-
   /**
    * Effect: Real-time clock tick every minute.
    */
@@ -229,27 +226,7 @@ export default function DashboardLayout({
     };
   }, [showProfilePanel]);
 
-  /**
-   * Memoized Value: Recent History Labels
-   * Formats the last 3 tasks for display in the dashboard summary.
-   */
-  const recentHistory = useMemo(() => {
-    if (!Array.isArray(history) || history.length === 0) return [];
-    const lastThree = history.slice(-3);
-    return lastThree.map((item, idx) => {
-      const indexNumber = history.length - (lastThree.length - 1 - idx);
-      const title =
-        item.title && item.title !== "Untitled task"
-          ? item.title
-          : `Task ${indexNumber}`;
-
-      return {
-        label: title,
-        value: item.tasksCompleted || tasksCompleted,
-        completedAt: item.completedAt,
-      };
-    });
-  }, [history, tasksCompleted]);
+  // recentHistory was unused and removed to satisfy ESLint.
 
   /**
    * Memoized Value: Formatted Time Label for Topbar.

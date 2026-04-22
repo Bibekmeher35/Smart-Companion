@@ -23,9 +23,9 @@ export default function AnalyticsPage({ username, progress = {}, history = [] })
   // Extract core progress metrics
   const tasksCompleted = progress?.tasksCompleted || 0;
   const currentStreak = progress?.currentStreak || 0;
-  const completedDates = Array.isArray(progress?.completedDates)
-    ? progress.completedDates
-    : [];
+  const completedDates = useMemo(() => {
+    return Array.isArray(progress?.completedDates) ? progress.completedDates : [];
+  }, [progress?.completedDates]);
 
   /**
    * Memoized Value: Last Completed Task Timestamp
