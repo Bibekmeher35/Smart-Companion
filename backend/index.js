@@ -25,11 +25,25 @@ const app = express();
  */
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000",
-      "https://smart-companion-beta.vercel.app",
-      "https://bibekg62rtrjsivganup.drops.nxtwave.tech",
-    ],
+    origin: function (origin, callback) {
+      const allowedOrigins = [
+        "http://localhost:3000",
+        "https://smart-companion-beta.vercel.app",
+        "https://bibekg62rtrjsivganup.drops.nxtwave.tech",
+      ];
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+
+      const isLocalNetwork = origin.match(
+        /^http:\/\/(?:localhost|127|10|172\.(?:1[6-9]|2[0-9]|3[01])|192\.168)\./
+      );
+
+      if (allowedOrigins.indexOf(origin) !== -1 || isLocalNetwork) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -153,4 +167,3 @@ const PORT = process.env.PORT || 5050;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-

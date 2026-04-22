@@ -6,13 +6,14 @@
 const isLocalhost = Boolean(
   window.location.hostname === "localhost" ||
     window.location.hostname === "[::1]" ||
+    // Local network IPs (10.x.x.x, 172.16.x.x to 172.31.x.x, 192.168.x.x)
     window.location.hostname.match(
-      /^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/
+      /^(?:10|127|172\.(?:1[6-9]|2[0-9]|3[01])|192\.168)\./
     )
 );
 
 const API_URL = isLocalhost
-  ? "http://localhost:5050"
+  ? `http://${window.location.hostname}:5050`
   : "https://smart-companion-5znk.onrender.com";
 
 /**
@@ -223,4 +224,3 @@ export const taskAPI = {
     return data;
   },
 };
-
