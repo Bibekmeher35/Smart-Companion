@@ -75,7 +75,8 @@ async function callGemini(prompt) {
   );
 
   if (!response.ok) {
-    throw new Error(await response.text());
+    const errorData = await response.text();
+    throw new Error(`Gemini API Error: ${response.status} - ${errorData}`);
   }
 
   const data = await response.json();
@@ -144,17 +145,13 @@ Return ONLY the steps, each on a new line.
 
     return res.json({ steps });
   } catch (error) {
-    console.error("Gemini unavailable, using fallback:", error.message);
+    console.error("Task Decomposition Error:", error.message);
 
-    // Fallback static steps in case the AI service is unreachable
-    return res.json({
-      steps: [
-        "Pick up items from the floor",
-        "Put books or objects on the table",
-        "Throw visible trash into the bin",
-        "Wipe one surface",
-        "Take a short break",
-      ],
+    // Return a structured error instead of hardcoded steps
+    return res.status(503).json({
+      error: "The AI service is temporarily unavailable.",
+      message: "We couldn't break down this task right now. Please try again in a few seconds.",
+      details: error.message
     });
   }
 });
