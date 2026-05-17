@@ -1,5 +1,15 @@
+<<<<<<< HEAD
+import React, { useState } from "react";
+
+/**
+ * TaskPage Component.
+ * The core interaction area where users input a task, watch it get decomposed by AI,
+ * and then follow the generated steps one-by-one.
+ */
+=======
 // import React, { useState, useEffect } from "react";
 
+>>>>>>> 3babafa (update message)
 export default function TaskPage({
   task,
   setTask,
@@ -11,6 +21,24 @@ export default function TaskPage({
   resetTaskSession,
   onBack,
 }) {
+<<<<<<< HEAD
+  const [loading, setLoading] = useState(false);
+
+  // Helper to identify if the user is on the final step of the decomposition
+  const isLastStep = steps.length > 0 && currentIndex === steps.length - 1;
+
+  /**
+   * Advances the user to the next step.
+   * If it's the last step, the markDone call (in App.js) will trigger taskFinished.
+   */
+  const handleMarkDone = () => {
+    markDone();
+  };
+
+  /**
+   * Finalizes the task session, resets states, and navigates back to the dashboard.
+   */
+=======
   const isLastStep = steps.length > 0 && currentIndex === steps.length - 1;
 
   const handleMarkDone = () => {
@@ -18,6 +46,7 @@ export default function TaskPage({
     markDone();
   };
 
+>>>>>>> 3babafa (update message)
   const handleFinish = () => {
     if (resetTaskSession) {
       resetTaskSession();
@@ -26,8 +55,15 @@ export default function TaskPage({
       onBack();
     }
   };
+<<<<<<< HEAD
+
   return (
     <div
+      className="task-page"
+=======
+  return (
+    <div
+>>>>>>> 3babafa (update message)
       style={{
         maxWidth: "800px",
         margin: "40px auto",
@@ -39,11 +75,19 @@ export default function TaskPage({
     >
       <h2 style={{ marginBottom: "20px" }}>Task Decomposition</h2>
 
+<<<<<<< HEAD
+      {/* Input Section: Where the user defines the goal */}
+=======
+>>>>>>> 3babafa (update message)
       <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
         <input
           value={task}
           onChange={(e) => setTask(e.target.value)}
+<<<<<<< HEAD
+          placeholder="Enter your task (ex: How to clean room)"
+=======
           placeholder="Enter your task..."
+>>>>>>> 3babafa (update message)
           style={{
             flex: 1,
             padding: "10px",
@@ -52,13 +96,71 @@ export default function TaskPage({
           }}
         />
         <button
+<<<<<<< HEAD
+          onClick={async () => {
+            if (!task.trim()) return;
+            setLoading(true);
+            await sendTask(); // Triggers the backend AI call
+            setLoading(false);
+          }}
+          disabled={loading}
+          style={{
+            background: loading ? "#a5b4fc" : "#4f46e5",
+=======
           onClick={sendTask}
           style={{
             background: "#4f46e5",
+>>>>>>> 3babafa (update message)
             color: "white",
             border: "none",
             padding: "10px 16px",
             borderRadius: "6px",
+<<<<<<< HEAD
+            cursor: loading ? "not-allowed" : "pointer",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+          }}
+        >
+          {loading && (
+            <span
+              style={{
+                width: "16px",
+                height: "16px",
+                border: "2px solid white",
+                borderTop: "2px solid transparent",
+                borderRadius: "50%",
+                animation: "spin 0.8s linear infinite",
+              }}
+            />
+          )}
+          {loading ? "Generating..." : "Generate"}
+        </button>
+      </div>
+
+      {/* Loading Hint: Informs user about the expected wait time for AI */}
+      {loading && (
+        <div
+          style={{
+            marginBottom: "20px",
+            background: "#eef2ff",
+            padding: "12px 16px",
+            borderRadius: "8px",
+            color: "#3730a3",
+            fontSize: "14px",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            animation: "fadeIn 0.3s ease-in-out",
+          }}
+        >
+          ⏳ Please wait... This may take 5–7 seconds while we break your task
+          into clear steps.
+        </div>
+      )}
+
+      {/* Step-by-Step Viewer: Displays one step at a time */}
+=======
             cursor: "pointer",
           }}
         >
@@ -66,6 +168,7 @@ export default function TaskPage({
         </button>
       </div>
 
+>>>>>>> 3babafa (update message)
       {steps.length > 0 && !taskFinished && (
         <div
           style={{
@@ -97,6 +200,10 @@ export default function TaskPage({
         </div>
       )}
 
+<<<<<<< HEAD
+      {/* Success View: Displayed once all steps are marked done */}
+=======
+>>>>>>> 3babafa (update message)
       {taskFinished && (
         <div
           style={{
@@ -129,6 +236,27 @@ export default function TaskPage({
           </button>
         </div>
       )}
+<<<<<<< HEAD
+
+      {/* CSS Keyframes for Spinner and Animations */}
+      <style>
+        {`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+          @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+        `}
+      </style>
     </div>
   );
 }
+
+=======
+    </div>
+  );
+}
+>>>>>>> 3babafa (update message)
