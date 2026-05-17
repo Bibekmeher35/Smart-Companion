@@ -70,15 +70,11 @@
   position: relative;
 }
 
-<<<<<<< HEAD
 .password-field {
   position: relative;
 }
 
 .password-field input {
-=======
-.password-group input {
->>>>>>> 3babafa (update message)
   padding-right: 70px;
 }
 
@@ -87,7 +83,6 @@
   right: 10px;
   top: 50%;
   transform: translateY(-50%);
-<<<<<<< HEAD
   width: 34px;
   height: 34px;
   display: inline-flex;
@@ -104,12 +99,6 @@
 
 .password-toggle:hover {
   color: #4338ca;
-=======
-  font-size: 0.85rem;
-  color: #4f46e5;
-  cursor: pointer;
-  user-select: none;
->>>>>>> 3babafa (update message)
 }
 
 button#login-btn {

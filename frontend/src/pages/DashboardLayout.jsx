@@ -1,35 +1,11 @@
 import "./dashboard.css";
-<<<<<<< HEAD
 import "./dashboard-responsive.css";
-=======
->>>>>>> 3babafa (update message)
-import Calendar from "../components/Calendar";
-import TasksChart from "../components/TasksChart";
-import TaskPage from "./TaskPage";
-import ProfileSettings from "./ProfileSettings";
-<<<<<<< HEAD
-import AnalyticsPage from "./AnalyticsPage";
-import ChartsPage from "./ChartsPage";
-import { authAPI } from "../utils/api";
-import TodoList from "../components/TodoList";
-import SearchModal from "../components/SearchModal";
-import { useEffect, useMemo, useRef, useState } from "react";
-import {
-  MdHome,
-  MdChecklist,
-  MdMenu,
-=======
-import { useState, useMemo } from "react";
-import {
-  MdHome,
-  MdChecklist,
->>>>>>> 3babafa (update message)
+import{
   MdInsights,
   MdShowChart,
   MdSettings,
   MdLogout,
   MdSmartToy,
-<<<<<<< HEAD
   MdNotifications,
   MdAccountCircle,
 } from "react-icons/md";
@@ -48,50 +24,6 @@ function ChangePasswordSection({ username }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus(null);
-=======
-} from "react-icons/md";
-
-export default function DashboardLayout({
-  progress,
-  history = [],
-  profile,
-  updateProfile,
-  task,
-  setTask,
-  steps,
-  currentIndex,
-  sendTask,
-  markDone,
-  taskFinished,
-  resetTaskSession,
-}) {
-  const [sidebarOpen, setSidebarOpen] = useState(() => {
-    if (typeof window === "undefined") return true;
-    return window.innerWidth >= 992;
-  });
-
-  const [activeItem, setActiveItem] = useState("dashboard");
-
-  const tasksCompleted = progress?.tasksCompleted || 0;
-
-  const recentHistory = useMemo(() => {
-    if (!Array.isArray(history) || history.length === 0) return [];
-    const lastThree = history.slice(-3);
-    return lastThree.map((item, idx) => {
-      const indexNumber = history.length - (lastThree.length - 1 - idx);
-      const title =
-        item.title && item.title !== "Untitled task"
-          ? item.title
-          : `Task ${indexNumber}`;
-
-      return {
-        label: title,
-        value: item.tasksCompleted || tasksCompleted,
-        completedAt: item.completedAt,
-      };
-    });
-  }, [history, tasksCompleted]);
->>>>>>> 3babafa (update message)
 
     if (!username) {
       setStatus({ type: "error", message: "No user is currently logged in." });
@@ -311,7 +243,6 @@ export default function DashboardLayout({
 
   return (
     <div className="dashboard-root">
-<<<<<<< HEAD
       {/* Sidebar Navigation */}
       <aside className={`sidebar ${sidebarOpen ? "open" : "closed"}`}>
         <div className="sidebar-header">
@@ -429,125 +360,17 @@ export default function DashboardLayout({
           onClick={() => setSidebarOpen(false)}
         />
       )}
-=======
-      {
-        <aside className={`sidebar ${sidebarOpen ? "open" : "closed"}`}>
-          <div className="sidebar-header">
-            <div className="brand">
-              <span className="brand-logo">
-                <MdSmartToy />
-              </span>
-              {sidebarOpen && (
-                <span className="brand-text">Smart Companion</span>
-              )}
-            </div>
-            <button
-              className="sidebar-toggle"
-              onClick={() => setSidebarOpen((prev) => !prev)}
-            >
-              {sidebarOpen ? "«" : "»"}
-            </button>
-          </div>
-
-          <nav className="sideList">
-            <button
-              className={`nav-item nav-item-home ${
-                activeItem === "dashboard" ? "active" : ""
-              }`}
-              onClick={() => {
-                setActiveItem("dashboard");
-              }}
-            >
-              <span className="nav-icon">
-                <MdHome />
-              </span>
-              <span className="nav-label">Home</span>
-            </button>
-
-            <button
-              className={`nav-item nav-item-task ${
-                activeItem === "task" ? "active" : ""
-              }`}
-              onClick={() => {
-                setActiveItem("task");
-              }}
-            >
-              <span className="nav-icon">
-                <MdChecklist />
-              </span>
-              <span className="nav-label">Task</span>
-            </button>
-
-            <button
-              className={`nav-item nav-item-analytics ${
-                activeItem === "analytics" ? "active" : ""
-              }`}
-              onClick={() => setActiveItem("analytics")}
-            >
-              <span className="nav-icon">
-                <MdInsights />
-              </span>
-              <span className="nav-label">Analytics</span>
-            </button>
-            <button
-              className={`nav-item nav-item-charts ${
-                activeItem === "charts" ? "active" : ""
-              }`}
-              onClick={() => setActiveItem("charts")}
-            >
-              <span className="nav-icon">
-                <MdShowChart />
-              </span>
-              <span className="nav-label">Charts</span>
-            </button>
-            <button
-              className={`nav-item nav-item-settings ${
-                activeItem === "settings" ? "active" : ""
-              }`}
-              onClick={() => setActiveItem("settings")}
-            >
-              <span className="nav-icon">
-                <MdSettings />
-              </span>
-              <span className="nav-label">Settings</span>
-            </button>
-          </nav>
-
-          <div className="sideFull">
-            <button
-              className="logout"
-              onClick={() => {
-                localStorage.clear();
-                window.location.reload();
-              }}
-            >
-              <span className="logout-icon">
-                <MdLogout />
-              </span>
-              <span className="logout-label">Log out</span>
-            </button>
-          </div>
-        </aside>
-      }
->>>>>>> 3babafa (update message)
 
       <main
         className="dashboard-main"
         style={{
-<<<<<<< HEAD
           marginLeft: sidebarOpen ? "236px" : "80px",
           width: sidebarOpen ? "calc(100% - 236px)" : "calc(100% - 80px)",
           transition: "margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1), width 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-=======
-          marginLeft: sidebarOpen ? "236px" : "72px",
-          width: sidebarOpen ? "calc(100% - 236px)" : "calc(100% - 72px)",
-          transition: "margin-left 0.3s ease, width 0.3s ease",
->>>>>>> 3babafa (update message)
         }}
       >
         {/* Topbar: Branding, Search, and Profile Actions */}
         <header className="topbar">
-<<<<<<< HEAD
           <button
             type="button"
             className="mobile-menu-btn"
@@ -561,10 +384,6 @@ export default function DashboardLayout({
             <h1 className="topbar-greeting">
               {greeting}, <span className="topbar-username">{displayName}</span>
             </h1>
-=======
-          <div>
-            <h1>Dashboard</h1>
->>>>>>> 3babafa (update message)
             <p>{nowLabel}</p>
           </div>
 
@@ -606,7 +425,6 @@ export default function DashboardLayout({
           </div>
         </header>
 
-<<<<<<< HEAD
         {showProfilePanel && (
           <div className="profile-dropdown" ref={profileDropdownRef}>
             <div className="profile-dropdown-header">
@@ -633,9 +451,6 @@ export default function DashboardLayout({
         
         {activeItem === "task" ? (
           // Task Decomposition & Execution View
-=======
-        {activeItem === "task" ? (
->>>>>>> 3babafa (update message)
           <TaskPage
             task={task}
             setTask={setTask}
@@ -647,7 +462,6 @@ export default function DashboardLayout({
             resetTaskSession={resetTaskSession}
             onBack={() => setActiveItem("dashboard")}
           />
-<<<<<<< HEAD
         ) : activeItem === "analytics" ? (
           // Detailed Productivity Analytics
           <AnalyticsPage
@@ -660,15 +474,11 @@ export default function DashboardLayout({
           <ChartsPage progress={progress || {}} history={history || []} />
         ) : activeItem === "settings" ? (
           // User Profile & App Preferences
-=======
-        ) : activeItem === "settings" ? (
->>>>>>> 3babafa (update message)
           <section className="settings-section">
             <div className="card settings-card">
               <h4>Profile & Preferences</h4>
               <p className="settings-subtitle">
                 Tune how Smart Companion breaks down your tasks.
-<<<<<<< HEAD
               </p>
               <ProfileSettings profile={profile || {}} onSave={updateProfile} />
             </div>
@@ -694,17 +504,6 @@ export default function DashboardLayout({
           // Default Dashboard (Home) View
           <>
             {/* Rapid Stat Overview */}
-=======
-              </p>
-              <ProfileSettings
-                profile={profile || {}}
-                onSave={updateProfile}
-              />
-            </div>
-          </section>
-        ) : (
-          <>
->>>>>>> 3babafa (update message)
             <section className="stats">
               <div className="stat green">
                 Points <b>{progress?.tasksCompleted * 10 || 0}</b>
@@ -725,7 +524,6 @@ export default function DashboardLayout({
 
             <section className="grid">
               <div className="grid-left">
-<<<<<<< HEAD
                 {/* To-do List Card */}
                 <div className="card wide">
                   <TodoList
@@ -737,47 +535,14 @@ export default function DashboardLayout({
                 </div>
 
                 {/* Progress Chart Card */}
-=======
-                <div className="card wide">
-                  <h4>To‑do Lists</h4>
-                  {recentHistory.length > 0 ? (
-                    <>
-                      <TasksChart history={recentHistory} />
-                      <ul className="history-list">
-                        {recentHistory
-                          .slice()
-                          .reverse()
-                          .map((item, idx) => (
-                            <li key={idx}>
-                              <span className="history-title">
-                                {item.label}
-                              </span>
-                              {item.completedAt && (
-                                <span className="history-date">
-                                  {new Date(
-                                    item.completedAt,
-                                  ).toLocaleDateString()}
-                                </span>
-                              )}
-                            </li>
-                          ))}
-                      </ul>
-                    </>
-                  ) : (
-                    <p>Manage your structured micro‑tasks efficiently.</p>
-                  )}
-                </div>
-
->>>>>>> 3babafa (update message)
                 <div className="card wide">
                   <h4>Tasks Completed</h4>
                   <TasksChart total={progress?.tasksCompleted || 0} />
                 </div>
               </div>
 
-<<<<<<< HEAD
               {/* Monthly Activity Calendar */}
-=======
+=======\
 >>>>>>> 3babafa (update message)
               <div className="card calendar">
                 <h4 style={{ textAlign: "center" }}>Calendar</h4>

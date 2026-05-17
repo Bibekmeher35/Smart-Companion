@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import React, { useState } from "react";
 
 /**
@@ -6,10 +5,6 @@ import React, { useState } from "react";
  * The core interaction area where users input a task, watch it get decomposed by AI,
  * and then follow the generated steps one-by-one.
  */
-=======
-// import React, { useState, useEffect } from "react";
-
->>>>>>> 3babafa (update message)
 export default function TaskPage({
   task,
   setTask,
@@ -21,7 +16,6 @@ export default function TaskPage({
   resetTaskSession,
   onBack,
 }) {
-<<<<<<< HEAD
   const [loading, setLoading] = useState(false);
 
   // Helper to identify if the user is on the final step of the decomposition
@@ -38,15 +32,6 @@ export default function TaskPage({
   /**
    * Finalizes the task session, resets states, and navigates back to the dashboard.
    */
-=======
-  const isLastStep = steps.length > 0 && currentIndex === steps.length - 1;
-
-  const handleMarkDone = () => {
-    // App will set taskFinished to true when the last step is completed
-    markDone();
-  };
-
->>>>>>> 3babafa (update message)
   const handleFinish = () => {
     if (resetTaskSession) {
       resetTaskSession();
@@ -55,15 +40,10 @@ export default function TaskPage({
       onBack();
     }
   };
-<<<<<<< HEAD
 
   return (
     <div
       className="task-page"
-=======
-  return (
-    <div
->>>>>>> 3babafa (update message)
       style={{
         maxWidth: "800px",
         margin: "40px auto",
@@ -75,19 +55,7 @@ export default function TaskPage({
     >
       <h2 style={{ marginBottom: "20px" }}>Task Decomposition</h2>
 
-<<<<<<< HEAD
       {/* Input Section: Where the user defines the goal */}
-=======
->>>>>>> 3babafa (update message)
-      <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
-        <input
-          value={task}
-          onChange={(e) => setTask(e.target.value)}
-<<<<<<< HEAD
-          placeholder="Enter your task (ex: How to clean room)"
-=======
-          placeholder="Enter your task..."
->>>>>>> 3babafa (update message)
           style={{
             flex: 1,
             padding: "10px",
@@ -96,7 +64,6 @@ export default function TaskPage({
           }}
         />
         <button
-<<<<<<< HEAD
           onClick={async () => {
             if (!task.trim()) return;
             setLoading(true);
@@ -106,16 +73,10 @@ export default function TaskPage({
           disabled={loading}
           style={{
             background: loading ? "#a5b4fc" : "#4f46e5",
-=======
-          onClick={sendTask}
-          style={{
-            background: "#4f46e5",
->>>>>>> 3babafa (update message)
             color: "white",
             border: "none",
             padding: "10px 16px",
             borderRadius: "6px",
-<<<<<<< HEAD
             cursor: loading ? "not-allowed" : "pointer",
             display: "flex",
             alignItems: "center",
@@ -160,15 +121,6 @@ export default function TaskPage({
       )}
 
       {/* Step-by-Step Viewer: Displays one step at a time */}
-=======
-            cursor: "pointer",
-          }}
-        >
-          Generate
-        </button>
-      </div>
-
->>>>>>> 3babafa (update message)
       {steps.length > 0 && !taskFinished && (
         <div
           style={{
@@ -200,63 +152,4 @@ export default function TaskPage({
         </div>
       )}
 
-<<<<<<< HEAD
       {/* Success View: Displayed once all steps are marked done */}
-=======
->>>>>>> 3babafa (update message)
-      {taskFinished && (
-        <div
-          style={{
-            marginTop: "20px",
-            background: "#ecfdf3",
-            padding: "20px",
-            borderRadius: "8px",
-            textAlign: "center",
-            border: "1px solid #bbf7d0",
-          }}
-        >
-          <h3 style={{ marginBottom: "10px", color: "#166534" }}>
-            All steps completed!
-          </h3>
-          <p style={{ marginBottom: "16px", color: "#166534" }}>
-            Great job. You can finish this task and return to your dashboard.
-          </p>
-          <button
-            onClick={handleFinish}
-            style={{
-              background: "#4f46e5",
-              color: "white",
-              border: "none",
-              padding: "10px 18px",
-              borderRadius: "999px",
-              cursor: "pointer",
-            }}
-          >
-            Finish
-          </button>
-        </div>
-      )}
-<<<<<<< HEAD
-
-      {/* CSS Keyframes for Spinner and Animations */}
-      <style>
-        {`
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-          @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-5px); }
-            to { opacity: 1; transform: translateY(0); }
-          }
-        `}
-      </style>
-    </div>
-  );
-}
-
-=======
-    </div>
-  );
-}
->>>>>>> 3babafa (update message)

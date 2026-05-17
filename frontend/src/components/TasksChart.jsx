@@ -9,7 +9,6 @@ import {
   Legend,
 } from "recharts";
 
-<<<<<<< HEAD
 /**
  * TasksChart Component.
  * Displays a bar chart representing task completion history or current progress.
@@ -19,22 +18,13 @@ import {
 export default function TasksChart({ total = 0, history = [] }) {
   // --- Data Transformation ---
   // Map historical items to a format Recharts understands, or use the total as a single bar.
-=======
-export default function TasksChart({ total = 0, history = [] }) {
->>>>>>> 3babafa (update message)
   const data =
     history && history.length
       ? history.map((item, idx) => ({
           name: item.label || `#${idx + 1}`,
-<<<<<<< HEAD
           Tasks: item.value ?? 0,
         }))
       : [{ name: "Progress", Tasks: total }];
-=======
-          value: item.value ?? 0,
-        }))
-      : [{ name: "Progress", value: total }];
->>>>>>> 3babafa (update message)
 
   return (
     <ResponsiveContainer width="100%" height={200}>

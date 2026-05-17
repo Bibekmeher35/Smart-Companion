@@ -1,11 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Login from "./pages/Login";
-<<<<<<< HEAD
 import { saveUser, getToken, removeToken, removeUser } from "./utils/storage";
 import { authAPI, taskAPI } from "./utils/api";
-=======
-import { saveUser } from "./utils/storage";
->>>>>>> 3babafa (update message)
 import DashboardLayout from "./pages/DashboardLayout";
 
 /**
@@ -13,7 +9,6 @@ import DashboardLayout from "./pages/DashboardLayout";
  * Manages global state including user session, current tasks, and application-wide settings.
  */
 function App() {
-<<<<<<< HEAD
   // --- State Hooks ---
   const [session, setSession] = useState(null); // Stores username, token, and full user data
   const [loading, setLoading] = useState(true); // Manages initial session verification state
@@ -77,54 +72,15 @@ function App() {
   }
 
   // If no active session, show the Login page
-=======
-  const [session, setSession] = useState(null);
-  const [task, setTask] = useState("");
-  const [steps, setSteps] = useState([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [currentTaskTitle, setCurrentTaskTitle] = useState("");
-  const [taskFinished, setTaskFinished] = useState(false);
-
-  // 🔐 LOGIN GUARD
->>>>>>> 3babafa (update message)
   if (!session) {
     return <Login onLogin={setSession} />;
   }
 
-<<<<<<< HEAD
   // --- core Business Logic Functions ---
 
   /**
    * Sends the user's task to the backend for decomposition into steps.
    */
-=======
->>>>>>> 3babafa (update message)
-  const sendTask = async () => {
-    if (!task.trim()) {
-      alert("Please enter a task");
-      return;
-    }
-
-    try {
-<<<<<<< HEAD
-      // Pass task and user profile preferences (step detail level)
-      const data = await taskAPI.decompose(task, session?.userData?.profile || {});
-=======
-      const res = await fetch("http://localhost:5050/decompose", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          task,
-          profile: session.userData.profile,
-        }),
-      });
-
-      if (!res.ok) {
-        throw new Error("Backend error");
-      }
-
-      const data = await res.json();
->>>>>>> 3babafa (update message)
 
       // Parse the response into an array of steps
       const parsedSteps = Array.isArray(data.steps)
@@ -149,7 +105,6 @@ function App() {
   const markDone = async () => {
     // If not on the last step, just advance to the next one
     if (currentIndex < steps.length - 1) {
-<<<<<<< HEAD
       setCurrentIndex((prev) => prev + 1);
       return;
     }
@@ -268,10 +223,6 @@ function App() {
     } catch (error) {
       console.error("Failed to add todo:", error);
       alert("Failed to add to-do. Please try again.");
-=======
-      setCurrentIndex(currentIndex + 1);
-      return;
->>>>>>> 3babafa (update message)
     }
 
     const updated = { ...session.userData };
@@ -327,7 +278,6 @@ function App() {
     setTaskFinished(true);
   };
 
-<<<<<<< HEAD
   /**
    * Toggles the completion status of a todo item.
    */
@@ -384,28 +334,11 @@ function App() {
         onAddTodo={handleAddTodo}
         onToggleTodo={handleToggleTodo}
         onDeleteTodo={handleDeleteTodo}
-=======
-  const resetTaskSession = () => {
-    setTask("");
-    setSteps([]);
-    setCurrentIndex(0);
-    setCurrentTaskTitle("");
-    setTaskFinished(false);
-  };
-
-  return (
-    <div style={{ minHeight: "100vh", background: "#f4f6f8" }}>
-      <DashboardLayout
-        progress={session.userData.progress}
-        history={session.userData.history || []}
-        profile={session.userData.profile || {}}
->>>>>>> 3babafa (update message)
         updateProfile={(nextProfile) => {
           const updatedUserData = {
             ...session.userData,
             profile: nextProfile,
           };
-<<<<<<< HEAD
           
           authAPI.updateProfile(nextProfile)
             .then(() => {
@@ -418,11 +351,6 @@ function App() {
             });
         }}
         onLogout={logout}
-=======
-          saveUser(session.username, updatedUserData);
-          setSession({ ...session, userData: updatedUserData });
-        }}
->>>>>>> 3babafa (update message)
         task={task}
         setTask={setTask}
         steps={steps}
