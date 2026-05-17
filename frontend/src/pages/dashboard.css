@@ -9,7 +9,11 @@
 /* Sidebar */
 .sidebar {
   width: 220px;
+<<<<<<< HEAD
   background: #5FB3B3;
+=======
+  background: #6f8fbf;
+>>>>>>> 3babafa (update message)
   color: white;
   padding: 20px;
   display: flex;
@@ -20,7 +24,11 @@
   height: 100vh;
   flex-shrink: 1;
   z-index: 1000;
+<<<<<<< HEAD
   transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+=======
+  transition: width 0.3s ease;
+>>>>>>> 3babafa (update message)
 }
 
 /* Sidebar open/close states (width-based) */
@@ -29,14 +37,19 @@
 }
 
 .sidebar.closed {
+<<<<<<< HEAD
   width: 80px;
   padding: 20px 14px;
+=======
+  width: 64px;
+>>>>>>> 3babafa (update message)
 }
 
 .sidebar-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+<<<<<<< HEAD
   margin-bottom: 30px;
 }
 
@@ -44,6 +57,8 @@
   flex-direction: column;
   justify-content: center;
   gap: 16px;
+=======
+>>>>>>> 3babafa (update message)
 }
 .sideList{
   display: flex;
@@ -58,16 +73,23 @@
   align-items: stretch;
 }
 .brand {
+<<<<<<< HEAD
+=======
+  margin-bottom: 30px;
+>>>>>>> 3babafa (update message)
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
+<<<<<<< HEAD
 .sidebar.closed .brand {
   margin: 0;
   justify-content: center;
 }
 
+=======
+>>>>>>> 3babafa (update message)
 .brand-text {
   font-size: 1.1rem;
   font-weight: 700;
@@ -81,7 +103,11 @@
   align-items: center;
   justify-content: center;
   border-radius: 12px;
+<<<<<<< HEAD
   background: linear-gradient(135deg, #9B7EBD, #F9D56E);
+=======
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+>>>>>>> 3babafa (update message)
   color: #ffffff;
   font-size: 22px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
@@ -116,6 +142,7 @@
 
 .nav-icon {
   display: inline-flex;
+<<<<<<< HEAD
   width: 36px;
   height: 36px;
   justify-content: center;
@@ -124,6 +151,15 @@
   background: rgba(255, 255, 255, 0.12);
   font-size: 20px;
   transition: transform 0.2s ease, background 0.2s ease;
+=======
+  width: 32px;
+  height: 32px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  font-size: 18px;
+>>>>>>> 3babafa (update message)
 }
 
 .nav-label {
@@ -137,6 +173,7 @@
 
 /* Per-item accent colors for modern feel */
 .nav-item-home .nav-icon {
+<<<<<<< HEAD
   background: linear-gradient(135deg, #9B7EBD, #B89DD1);
 }
 
@@ -154,6 +191,25 @@
 
 .nav-item-settings .nav-icon {
   background: linear-gradient(135deg, #FF9A8B, #FFB3A7);
+=======
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+}
+
+.nav-item-task .nav-icon {
+  background: linear-gradient(135deg, #f7971e, #ffd200);
+}
+
+.nav-item-analytics .nav-icon {
+  background: linear-gradient(135deg, #a18cd1, #fbc2eb);
+}
+
+.nav-item-charts .nav-icon {
+  background: linear-gradient(135deg, #11998e, #38ef7d);
+}
+
+.nav-item-settings .nav-icon {
+  background: linear-gradient(135deg, #ff5858, #f09819);
+>>>>>>> 3babafa (update message)
 }
 
 .logout {
@@ -165,7 +221,11 @@
   gap: 8px;
   width: 100%;
   padding: 10px 18px;
+<<<<<<< HEAD
   background: linear-gradient(135deg, #FF9A8B, #FFB3A7);
+=======
+  background: linear-gradient(135deg, #ff5858, #f09819);
+>>>>>>> 3babafa (update message)
   border-radius: 999px;
   color: #ffffff;
   border: none;
@@ -176,7 +236,11 @@
 }
 
 .logout:hover {
+<<<<<<< HEAD
   background: linear-gradient(135deg, #FFAD9F, #FFC4BA);
+=======
+  background: linear-gradient(135deg, #ff7b7b, #ffb347);
+>>>>>>> 3babafa (update message)
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
   transform: translateY(-1px);
 }
@@ -206,7 +270,11 @@
 .sidebar.closed .logout {
   width: 52px;
   padding: 8px;
+<<<<<<< HEAD
   border-radius: 12px;
+=======
+  border-radius: 50%;
+>>>>>>> 3babafa (update message)
   justify-content: center;
 }
 
@@ -311,6 +379,27 @@
 .sidebar-toggle:hover {
   background: rgba(255, 255, 255, 0.25);
   transform: scale(1.05);
+}
+
+/* Sidebar toggle button inside sidebar header */
+.sidebar-toggle {
+  background: #6f8fbf;
+  color: #ffffff;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
+}
+
+.sidebar-toggle:hover {
+  background: #5a76a0;
 }
 
 .top-actions {
@@ -573,7 +662,10 @@
   min-width: 0;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
+<<<<<<< HEAD
   border: 1px solid #FFD4C4;
+=======
+>>>>>>> 3babafa (update message)
 }
 
 .card:hover {
@@ -583,6 +675,7 @@
 
 .settings-section {
   margin-top: 24px;
+<<<<<<< HEAD
   display: grid;
   grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
   gap: 20px;
@@ -601,6 +694,12 @@
   background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.45), transparent 55%);
   opacity: 0.75;
   pointer-events: none;
+=======
+}
+
+.settings-card {
+  max-width: 520px;
+>>>>>>> 3babafa (update message)
 }
 
 .settings-subtitle {
@@ -610,6 +709,7 @@
   color: #4b5563;
 }
 
+<<<<<<< HEAD
 .settings-card h4 {
   margin-top: 0;
   font-size: 1.05rem;
@@ -617,6 +717,8 @@
   color: #111827;
 }
 
+=======
+>>>>>>> 3babafa (update message)
 .profile-settings {
   display: flex;
   flex-direction: column;
@@ -635,10 +737,13 @@
   color: #374151;
 }
 
+<<<<<<< HEAD
 .profile-settings .profile-label {
   font-weight: 500;
 }
 
+=======
+>>>>>>> 3babafa (update message)
 .profile-select {
   min-width: 200px;
   padding: 6px 10px;
@@ -655,6 +760,7 @@
   color: #374151;
 }
 
+<<<<<<< HEAD
 .profile-select:focus {
   outline: none;
   border-color: #9B7EBD;
@@ -662,6 +768,8 @@
   background: #ffffff;
 }
 
+=======
+>>>>>>> 3babafa (update message)
 .history-list {
   list-style: none;
   margin: 12px 0 0;
@@ -687,6 +795,7 @@
 .history-date {
   font-size: 0.8rem;
   color: #777;
+<<<<<<< HEAD
 }
 
 .analytics-page,
@@ -865,6 +974,8 @@
 
 .profile-dropdown-close:hover {
   background: #e5e7eb;
+=======
+>>>>>>> 3babafa (update message)
 }
 /* Remove duplicate dashboard-main block and merge .topbar definitions as per instructions */
 /* Desktop enhancement only */
@@ -884,6 +995,7 @@
     margin-left: 0 !important;
     width: 100% !important;
     padding: 16px;
+<<<<<<< HEAD
   }
 
   .mobile-menu-btn {
@@ -907,6 +1019,8 @@
   .sidebar.closed {
     width: 260px;
     transform: translateX(-100%);
+=======
+>>>>>>> 3babafa (update message)
   }
 
   .stats {

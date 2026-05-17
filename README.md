@@ -1,4 +1,5 @@
 # 🧠 Smart Companion  
+<<<<<<< HEAD
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen) ![License](https://img.shields.io/badge/license-MIT-blue) ![Version](https://img.shields.io/badge/version-2.0.0-blue)
 
 ### Bridging the Executive Function Gap with Neuro-Inclusive AI
@@ -6,6 +7,15 @@
 Smart Companion is a **full-stack web app with MongoDB database** supporting neurodivergent individuals (Autism, ADHD, Dyslexia) by breaking overwhelming tasks into manageable micro-steps using AI.
 
 Built with **React.js**, **Node.js**, **MongoDB**, and Google's **Gemini API**, it delivers adaptive task decomposition tailored to cognitive preferences.
+=======
+![Build Status](https://img.shields.io/badge/build-passing-brightgreen) ![License](https://img.shields.io/badge/license-MIT-blue) ![Version](https://img.shields.io/badge/version-1.0.0-blue)
+
+### Bridging the Executive Function Gap with Neuro-Inclusive AI
+
+Smart Companion is a **privacy-first full-stack web app** supporting neurodivergent individuals (Autism, ADHD, Dyslexia) by breaking overwhelming tasks into manageable micro-steps using AI.
+
+Built with **React.js**, **Node.js**, and Google’s **Gemini API**, it delivers adaptive task decomposition tailored to cognitive preferences.
+>>>>>>> 3babafa (update message)
 
 ---
 
@@ -32,8 +42,12 @@ Smart Companion offers:
 - ✅ Dyslexia-friendly UI mode  
 - ✅ Micro-step breakdown for clarity  
 - ✅ Progress tracking with rewards  
+<<<<<<< HEAD
 - ✅ MongoDB database with JWT authentication  
 - ✅ Multi-device data synchronization  
+=======
+- ✅ Privacy-first local data storage  
+>>>>>>> 3babafa (update message)
 - ✅ Clean, Google-style login experience  
 
 ---
@@ -42,12 +56,17 @@ Smart Companion offers:
 
 ## 🔹 Frontend
 - React.js (Create React App)  
+<<<<<<< HEAD
 - JWT token-based authentication  
+=======
+- Privacy-first LocalStorage  
+>>>>>>> 3babafa (update message)
 - Adaptive UI per neuro-profile  
 - Dashboard with charts & calendar  
 
 ## 🔹 Backend
 - Node.js & Express.js  
+<<<<<<< HEAD
 - MongoDB database with Mongoose ODM  
 - JWT authentication middleware  
 - Gemini API (`@google/generative-ai`)  
@@ -59,6 +78,10 @@ Smart Companion offers:
 - User authentication and profiles  
 - Task history and progress tracking  
 - Multi-device data synchronization  
+=======
+- Gemini API (`@google/generative-ai`)  
+- Prompt-engineered adaptive responses  
+>>>>>>> 3babafa (update message)
 
 ## 🔹 AI Layer
 - Constraint-based prompt tuning  
@@ -99,6 +122,7 @@ AI tailors output based on user profile.
 
 ---
 
+<<<<<<< HEAD
 ## 3️⃣ Secure Database Storage
 
 - MongoDB for persistent data storage  
@@ -109,6 +133,18 @@ AI tailors output based on user profile.
 - Protected API endpoints with middleware  
 
 All data is securely stored in MongoDB and accessible from any device.
+=======
+## 3️⃣ Privacy-Centric Architecture
+
+- No cloud database  
+- No unnecessary data sharing  
+- User accounts stored locally  
+- Passwords hashed with bcryptjs  
+- PIN-style data isolation  
+- Cognitive data never shared  
+
+All data is securely stored in the browser’s `localStorage`.
+>>>>>>> 3babafa (update message)
 
 ---
 
@@ -135,6 +171,7 @@ All data is securely stored in MongoDB and accessible from any device.
 ```
 smart-companion/
   backend/
+<<<<<<< HEAD
     config/
       db.js           # MongoDB connection
     models/
@@ -146,6 +183,11 @@ smart-companion/
     index.js          # Express server
     package.json      # Backend dependencies
     .env              # Environment variables
+=======
+    index.js          # Express server + /decompose route
+    package.json      # Backend dependencies
+    .env              # GEMINI_API_KEY (user-provided)
+>>>>>>> 3babafa (update message)
 
   frontend/
     src/
@@ -161,10 +203,15 @@ smart-companion/
         TasksChart.jsx
       utils/
         storage.js
+<<<<<<< HEAD
         api.js          # API service
 
     package.json      # Frontend dependencies & scripts
     .env              # Frontend environment variables
+=======
+
+    package.json      # Frontend dependencies & scripts
+>>>>>>> 3babafa (update message)
 ```
 
 ---
@@ -173,15 +220,22 @@ smart-companion/
 
 1. **Node.js (LTS)** – https://nodejs.org  
 2. npm (bundled with Node.js)  
+<<<<<<< HEAD
 3. **MongoDB** – https://www.mongodb.com/try/download/community (or use MongoDB Atlas)  
 4. Code editor (e.g., VS Code)  
+=======
+3. Code editor (e.g., VS Code)  
+>>>>>>> 3babafa (update message)
 
 Verify installations:
 
 ```bash
 node -v
 npm -v
+<<<<<<< HEAD
 mongosh --version
+=======
+>>>>>>> 3babafa (update message)
 ```
 
 Obtain Gemini API Key:
@@ -194,6 +248,7 @@ Obtain Gemini API Key:
 
 # ⚙️ Setup & Running
 
+<<<<<<< HEAD
 ## 📦 MongoDB Setup
 
 **Option 1: Local MongoDB**
@@ -218,6 +273,8 @@ mongosh
 
 ## 📥 Install Dependencies
 
+=======
+>>>>>>> 3babafa (update message)
 From project root:
 
 ```bash
@@ -228,6 +285,7 @@ cd ../frontend
 npm install
 ```
 
+<<<<<<< HEAD
 ## 🔧 Configure Environment Variables
 
 Create `.env` file in `backend/`:
@@ -245,6 +303,15 @@ REACT_APP_API_URL=http://localhost:5050
 ```
 
 Restart servers after editing `.env`.
+=======
+Create `.env` file in `backend/`:
+
+```
+GEMINI_API_KEY=YOUR_KEY_HERE
+```
+
+Restart backend after editing `.env`.
+>>>>>>> 3babafa (update message)
 
 ---
 
@@ -258,10 +325,14 @@ node index.js
 ```
 
 Expected output:  
+<<<<<<< HEAD
 ```
 MongoDB Connected: localhost
 Server running on port 5050
 ```
+=======
+`Server running on port 5050`
+>>>>>>> 3babafa (update message)
 
 ### 2️⃣ Frontend
 
@@ -281,11 +352,19 @@ Access app at:
 
 ## 🔐 Login / Create Account
 
+<<<<<<< HEAD
 - Click "New user? Create account"  
 - Enter username and password  
 - Login  
 
 Your data is stored in MongoDB and accessible from any device.
+=======
+- Click “New user? Create account”  
+- Enter username and password  
+- Login  
+
+Each user’s data is isolated and stored locally.
+>>>>>>> 3babafa (update message)
 
 ---
 
@@ -294,7 +373,11 @@ Your data is stored in MongoDB and accessible from any device.
 Displays:
 
 - Points  
+<<<<<<< HEAD
 - Today's target  
+=======
+- Today’s target  
+>>>>>>> 3babafa (update message)
 - Current streak  
 - Total tasks completed  
 - Recent task history (last 3)  
@@ -306,7 +389,11 @@ Displays:
 ## 📝 Task Page
 
 1. Select a task  
+<<<<<<< HEAD
 2. Enter task description (e.g., "Prepare for exam")  
+=======
+2. Enter task description (e.g., “Prepare for exam”)  
+>>>>>>> 3babafa (update message)
 3. Click Generate  
 4. Follow steps:  
    - Mark as Done  
@@ -368,13 +455,18 @@ Backend requires separate deployment.
 
 - Backend unreachable?  
   - Ensure `node index.js` is running  
+<<<<<<< HEAD
   - Check MongoDB connection  
   - Confirm URL: `https://smart-companion-5znk.onrender.com/decompose`  
+=======
+  - Confirm URL: `http://localhost:5050/decompose`  
+>>>>>>> 3babafa (update message)
 
 - Gemini API errors?  
   - Check `.env` file  
   - Restart backend  
 
+<<<<<<< HEAD
 - MongoDB connection errors?  
   - Verify MongoDB is running: `mongosh`  
   - Check `MONGODB_URI` in `.env`  
@@ -382,19 +474,33 @@ Backend requires separate deployment.
 - Authentication errors?  
   - Clear localStorage and login again  
   - Check JWT_SECRET in `.env`  
+=======
+- Data lost?  
+  - Data stored in `localStorage`  
+  - Clearing browser storage deletes it  
+>>>>>>> 3babafa (update message)
 
 ---
 
 # 🚀 Future Improvements
 
+<<<<<<< HEAD
 - Password reset via email  
 - OAuth login (Google/GitHub)  
 - Refresh token rotation  
+=======
+- Replace `localStorage` with real DB (MongoDB / Supabase)  
+- Add JWT authentication  
+- Integrate OAuth login  
+>>>>>>> 3babafa (update message)
 - Weekly productivity analytics  
 - Time tracking per step  
 - Mobile-first UI  
 - Enhanced accessibility fonts  
+<<<<<<< HEAD
 - Admin dashboard  
+=======
+>>>>>>> 3babafa (update message)
 
 ---
 
@@ -404,11 +510,17 @@ This project covers:
 
 - Full-stack React + Node.js development  
 - REST API design  
+<<<<<<< HEAD
 - MongoDB database integration  
 - JWT authentication  
 - AI API integration  
 - State management  
 - Secure password hashing  
+=======
+- AI API integration  
+- State management  
+- Local storage handling  
+>>>>>>> 3babafa (update message)
 - Adaptive UI design  
 
 ---
@@ -423,4 +535,8 @@ Smart Companion bridges the executive function gap with neuro-inclusive AI — e
 
 Neurodivergent minds who deserve tools designed around their thinking — not against it.
 
+<<<<<<< HEAD
 ---
+=======
+---
+>>>>>>> 3babafa (update message)

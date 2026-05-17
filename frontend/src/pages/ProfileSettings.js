@@ -1,24 +1,33 @@
 import React from "react";
 
+<<<<<<< HEAD
 /**
  * ProfileSettings Component.
  * Allows users to customize their experience, including AI task granularity
  * and accessibility features like Dyslexia-friendly mode.
  */
+=======
+>>>>>>> 3babafa (update message)
 function ProfileSettings({ profile = {}, onSave }) {
   const stepLevel = profile.stepLevel || "medium";
   const dyslexiaMode = !!profile.dyslexiaMode;
 
+<<<<<<< HEAD
   /**
    * Helper: Updates a specific profile key and triggers the onSave callback.
    */
+=======
+>>>>>>> 3babafa (update message)
   const update = (key, value) => {
     onSave({ ...profile, [key]: value });
   };
 
   return (
     <div className="profile-settings">
+<<<<<<< HEAD
       {/* Step Granularity: Controls how deep the AI decomposes tasks */}
+=======
+>>>>>>> 3babafa (update message)
       <div className="profile-row">
         <label className="profile-label">Step granularity</label>
         <select
@@ -32,7 +41,10 @@ function ProfileSettings({ profile = {}, onSave }) {
         </select>
       </div>
 
+<<<<<<< HEAD
       {/* Accessibility: Toggles specialized fonts/spacing for easier reading */}
+=======
+>>>>>>> 3babafa (update message)
       <div className="profile-row">
         <label className="profile-label">Reading comfort</label>
         <label className="profile-toggle">

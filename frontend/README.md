@@ -8,7 +8,11 @@ The frontend runs on:
 
 To use the AI task decomposition (“Generate” button), you must also run the backend API (default):
 
+<<<<<<< HEAD
 - `https://smart-companion-5znk.onrender.com`
+=======
+- `http://localhost:5050`
+>>>>>>> 3babafa (update message)
 
 ---
 
@@ -38,7 +42,11 @@ Then open:
 
 When you click **Generate** on the Task page, the frontend calls:
 
+<<<<<<< HEAD
 - `https://smart-companion-5znk.onrender.com/decompose`
+=======
+- `http://localhost:5050/decompose`
+>>>>>>> 3babafa (update message)
 
 If you see **“Backend not reachable”**, start the backend in another terminal:
 
