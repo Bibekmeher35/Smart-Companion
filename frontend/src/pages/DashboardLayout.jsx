@@ -1,6 +1,19 @@
+import React, { useEffect, useState, useMemo, useRef } from "react";
 import "./dashboard.css";
 import "./dashboard-responsive.css";
+import Calendar from "../components/Calendar";
+import TasksChart from "../components/TasksChart";
+import TaskPage from "./TaskPage";
+import ProfileSettings from "./ProfileSettings";
+import AnalyticsPage from "./AnalyticsPage";
+import ChartsPage from "./ChartsPage";
+import { authAPI } from "../utils/api";
+import TodoList from "../components/TodoList";
+import SearchModal from "../components/SearchModal";
 import {
+  MdHome,
+  MdChecklist,
+  MdMenu,
   MdInsights,
   MdShowChart,
   MdSettings,
