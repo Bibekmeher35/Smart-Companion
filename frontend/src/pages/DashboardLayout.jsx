@@ -1,4 +1,3 @@
-import React, { useEffect, useState, useMemo, useRef } from "react";
 import "./dashboard.css";
 import "./dashboard-responsive.css";
 import Calendar from "../components/Calendar";
@@ -7,9 +6,11 @@ import TaskPage from "./TaskPage";
 import ProfileSettings from "./ProfileSettings";
 import AnalyticsPage from "./AnalyticsPage";
 import ChartsPage from "./ChartsPage";
+import { saveUser } from "../utils/storage";
 import { authAPI } from "../utils/api";
 import TodoList from "../components/TodoList";
 import SearchModal from "../components/SearchModal";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   MdHome,
   MdChecklist,
@@ -181,6 +182,8 @@ export default function DashboardLayout({
   const [showSearchModal, setShowSearchModal] = useState(false); // Global search modal visibility
   const profileDropdownRef = useRef(null); // Ref for handling clicks outside the profile panel
 
+  const tasksCompleted = progress?.tasksCompleted || 0;
+
   /**
    * Effect: Real-time clock tick every minute.
    */
@@ -226,7 +229,27 @@ export default function DashboardLayout({
     };
   }, [showProfilePanel]);
 
-  // recentHistory was unused and removed to satisfy ESLint.
+  /**
+   * Memoized Value: Recent History Labels
+   * Formats the last 3 tasks for display in the dashboard summary.
+   */
+  const recentHistory = useMemo(() => {
+    if (!Array.isArray(history) || history.length === 0) return [];
+    const lastThree = history.slice(-3);
+    return lastThree.map((item, idx) => {
+      const indexNumber = history.length - (lastThree.length - 1 - idx);
+      const title =
+        item.title && item.title !== "Untitled task"
+          ? item.title
+          : `Task ${indexNumber}`;
+
+      return {
+        label: title,
+        value: item.tasksCompleted || tasksCompleted,
+        completedAt: item.completedAt,
+      };
+    });
+  }, [history, tasksCompleted]);
 
   /**
    * Memoized Value: Formatted Time Label for Topbar.
@@ -263,7 +286,9 @@ export default function DashboardLayout({
             <span className="brand-logo">
               <MdSmartToy />
             </span>
-            {sidebarOpen && <span className="brand-text">Smart Companion</span>}
+            {sidebarOpen && (
+              <span className="brand-text">Smart Companion</span>
+            )}
           </div>
           <button
             className="sidebar-toggle"
@@ -377,8 +402,7 @@ export default function DashboardLayout({
         style={{
           marginLeft: sidebarOpen ? "236px" : "80px",
           width: sidebarOpen ? "calc(100% - 236px)" : "calc(100% - 80px)",
-          transition:
-            "margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1), width 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+          transition: "margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1), width 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
         }}
       >
         {/* Topbar: Branding, Search, and Profile Actions */}
@@ -412,7 +436,7 @@ export default function DashboardLayout({
               />
               <kbd className="search-bar-kbd">⌘K</kbd>
             </div>
-
+            
             <button
               type="button"
               className="top-icon top-icon-notification"
@@ -424,7 +448,7 @@ export default function DashboardLayout({
             >
               <MdNotifications />
             </button>
-
+            
             <button
               type="button"
               className="top-icon top-icon-profile"
@@ -460,7 +484,7 @@ export default function DashboardLayout({
         )}
 
         {/* --- Main Content Routing --- */}
-
+        
         {activeItem === "task" ? (
           // Task Decomposition & Execution View
           <TaskPage
