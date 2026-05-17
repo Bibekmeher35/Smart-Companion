@@ -81,6 +81,15 @@ function App() {
   /**
    * Sends the user's task to the backend for decomposition into steps.
    */
+  const sendTask = async () => {
+    if (!task.trim()) {
+      alert("Please enter a task");
+      return;
+    }
+
+    try {
+      // Pass task and user profile preferences (step detail level)
+      const data = await taskAPI.decompose(task, session?.userData?.profile || {});
 
       // Parse the response into an array of steps
       const parsedSteps = Array.isArray(data.steps)
@@ -224,58 +233,6 @@ function App() {
       console.error("Failed to add todo:", error);
       alert("Failed to add to-do. Please try again.");
     }
-
-    const updated = { ...session.userData };
-    updated.progress.tasksCompleted += 1;
-    updated.progress.currentStreak += 1;
-
-    const today = new Date().toISOString().split("T")[0];
-
-    if (!updated.progress.completedDates) {
-      updated.progress.completedDates = [];
-    }
-
-    if (!updated.progress.completedDates.includes(today)) {
-      updated.progress.completedDates.push(today);
-    }
-
-    // 🕒 Per‑task history
-    if (!Array.isArray(updated.history)) {
-      updated.history = [];
-    }
-    updated.history.push({
-      title: currentTaskTitle || null,
-      completedAt: new Date().toISOString(),
-      stepsCount: steps.length,
-      tasksCompleted: updated.progress.tasksCompleted,
-    });
-
-    // 🎖 Rewards Logic
-    if (
-      updated.progress.tasksCompleted === 1 &&
-      !updated.rewards.includes("First Step")
-    ) {
-      updated.rewards.push("First Step");
-    }
-
-    if (
-      updated.progress.tasksCompleted === 5 &&
-      !updated.rewards.includes("Consistency Badge")
-    ) {
-      updated.rewards.push("Consistency Badge");
-    }
-
-    if (
-      updated.progress.currentStreak === 3 &&
-      !updated.rewards.includes("3-Day Streak")
-    ) {
-      updated.rewards.push("3-Day Streak");
-    }
-
-    saveUser(session.username, updated);
-    setSession({ ...session, userData: updated });
-    setCurrentTaskTitle("");
-    setTaskFinished(true);
   };
 
   /**

@@ -1,6 +1,6 @@
 import "./dashboard.css";
 import "./dashboard-responsive.css";
-import{
+import {
   MdInsights,
   MdShowChart,
   MdSettings,
@@ -250,9 +250,7 @@ export default function DashboardLayout({
             <span className="brand-logo">
               <MdSmartToy />
             </span>
-            {sidebarOpen && (
-              <span className="brand-text">Smart Companion</span>
-            )}
+            {sidebarOpen && <span className="brand-text">Smart Companion</span>}
           </div>
           <button
             className="sidebar-toggle"
@@ -366,7 +364,8 @@ export default function DashboardLayout({
         style={{
           marginLeft: sidebarOpen ? "236px" : "80px",
           width: sidebarOpen ? "calc(100% - 236px)" : "calc(100% - 80px)",
-          transition: "margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1), width 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+          transition:
+            "margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1), width 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
         }}
       >
         {/* Topbar: Branding, Search, and Profile Actions */}
@@ -400,7 +399,7 @@ export default function DashboardLayout({
               />
               <kbd className="search-bar-kbd">⌘K</kbd>
             </div>
-            
+
             <button
               type="button"
               className="top-icon top-icon-notification"
@@ -412,7 +411,7 @@ export default function DashboardLayout({
             >
               <MdNotifications />
             </button>
-            
+
             <button
               type="button"
               className="top-icon top-icon-profile"
@@ -448,7 +447,7 @@ export default function DashboardLayout({
         )}
 
         {/* --- Main Content Routing --- */}
-        
+
         {activeItem === "task" ? (
           // Task Decomposition & Execution View
           <TaskPage
@@ -542,8 +541,6 @@ export default function DashboardLayout({
               </div>
 
               {/* Monthly Activity Calendar */}
-=======\
->>>>>>> 3babafa (update message)
               <div className="card calendar">
                 <h4 style={{ textAlign: "center" }}>Calendar</h4>
                 <Calendar completedDates={progress?.completedDates || []} />

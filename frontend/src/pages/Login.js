@@ -66,6 +66,16 @@ export default function Login({ onLogin }) {
   return (
     <div className="login-root">
       {/* Branding Section */}
+      <div className="login-hero">
+        <h1>Smart Companion</h1>
+        <p>Turn big tasks into simple, guided steps.</p>
+      </div>
+
+      {/* Form Section */}
+      <div className="login-container">
+        <h2>{isNewUser ? "Create your account" : "Welcome back"}</h2>
+
+        {/* Username Field */}
         <div className="input-group">
           <label>
             Username <span style={{ color: "red" }}>*</span>

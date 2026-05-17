@@ -54,6 +54,20 @@
   justify-content: center;
 }
 
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-logo {
+  display: inline-flex;
+  width: 42px;
+  height: 42px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #F9D56E, #FDE08D);
   color: #ffffff;
   font-size: 22px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
@@ -606,7 +620,6 @@
   background: #ffffff;
 }
 
-}
 /* Remove duplicate dashboard-main block and merge .topbar definitions as per instructions */
 /* Desktop enhancement only */
 @media (min-width: 992px) {
