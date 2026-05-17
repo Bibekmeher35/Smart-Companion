@@ -56,6 +56,11 @@ export default function TaskPage({
       <h2 style={{ marginBottom: "20px" }}>Task Decomposition</h2>
 
       {/* Input Section: Where the user defines the goal */}
+      <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
+        <input
+          value={task}
+          onChange={(e) => setTask(e.target.value)}
+          placeholder="Enter your task (ex: How to clean room)"
           style={{
             flex: 1,
             padding: "10px",
@@ -153,3 +158,52 @@ export default function TaskPage({
       )}
 
       {/* Success View: Displayed once all steps are marked done */}
+      {taskFinished && (
+        <div
+          style={{
+            marginTop: "20px",
+            background: "#ecfdf3",
+            padding: "20px",
+            borderRadius: "8px",
+            textAlign: "center",
+            border: "1px solid #bbf7d0",
+          }}
+        >
+          <h3 style={{ marginBottom: "10px", color: "#166534" }}>
+            All steps completed!
+          </h3>
+          <p style={{ marginBottom: "16px", color: "#166534" }}>
+            Great job. You can finish this task and return to your dashboard.
+          </p>
+          <button
+            onClick={handleFinish}
+            style={{
+              background: "#4f46e5",
+              color: "white",
+              border: "none",
+              padding: "10px 18px",
+              borderRadius: "999px",
+              cursor: "pointer",
+            }}
+          >
+            Finish
+          </button>
+        </div>
+      )}
+
+      {/* CSS Keyframes for Spinner and Animations */}
+      <style>
+        {`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+          @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+        `}
+      </style>
+    </div>
+  );
+}
