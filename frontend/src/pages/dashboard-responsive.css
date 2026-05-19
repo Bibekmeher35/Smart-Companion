@@ -7,7 +7,7 @@
 
 /* Main with flexible padding */
 .dashboard-main {
-  padding: clamp(16px, 3vw, 40px);
+  padding: 0 clamp(16px, 3vw, 40px) clamp(16px, 3vw, 40px) clamp(16px, 3vw, 40px);
   overflow-x: hidden;
   min-width: 0;
   width: 100%;
@@ -17,7 +17,9 @@
 /* Topbar responsive */
 .topbar {
   gap: clamp(8px, 2vw, 16px);
-  padding: clamp(12px, 2vh, 16px) 0;
+  padding: clamp(16px, 3vh, 24px) clamp(16px, 3vw, 40px) clamp(12px, 2vh, 16px) clamp(16px, 3vw, 40px);
+  margin-left: calc(-1 * clamp(16px, 3vw, 40px));
+  margin-right: calc(-1 * clamp(16px, 3vw, 40px));
   margin-bottom: clamp(12px, 2vh, 20px);
 }
 

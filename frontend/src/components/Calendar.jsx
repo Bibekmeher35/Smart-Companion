@@ -9,6 +9,13 @@ import {
   isSameMonth,
   isToday,
 } from "date-fns";
+import {
+  CalendarContainer,
+  CalendarWeekdays,
+  CalendarWeeks,
+  CalendarWeek,
+  CalendarDay,
+} from "../styles/AnalyticsStyles";
 
 /**
  * Calendar Component.
@@ -38,61 +45,54 @@ export default function Calendar({ completedDates = [] }) {
        * Indigo (#4f46e5) is used to highlight today.
        */
       const background =
-        count >= 3 ? "#14532d" : // Dark Green for high activity
-        count === 2 ? "#16a34a" : // Medium Green
-        count === 1 ? "#4ade80" : // Light Green
-        isToday(day) ? "#4f46e5" : // Indigo for today
-        "#f1f5f9"; // Neutral for no activity
+        count >= 3 ? "#166534" : // Deep green for high activity
+        count === 2 ? "#22c55e" : // Bright green
+        count === 1 ? "#86efac" : // Soft light green
+        isToday(day) ? "#6366f1" : // Premium indigo for today
+        "#f8fafc"; // Soft gray-blue background for empty days
 
-      const textColor = count > 0 || isToday(day) ? "#fff" : "#000";
+      const textColor = count > 0 || isToday(day) ? "#ffffff" : "#334155";
 
       // Build each day cell
       days.push(
-        <div
-          key={day}
-          style={{
-            padding: "8px",
-            borderRadius: "6px",
-            textAlign: "center",
-            background,
-            color: textColor,
-            // Fade out days that belong to the previous or next month
-            opacity: isSameMonth(day, monthStart) ? 1 : 0.4,
-          }}
+        <CalendarDay
+          key={day.toString()}
+          $background={background}
+          $textColor={textColor}
+          $isToday={isToday(day)}
+          $count={count}
+          $isSameMonth={isSameMonth(day, monthStart)}
         >
           {format(day, "d")}
-        </div>
+        </CalendarDay>
       );
       day = addDays(day, 1);
     }
 
     // Build the week row
     rows.push(
-      <div
-        key={day}
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(7, 1fr)",
-          gap: "6px",
-        }}
-      >
+      <CalendarWeek key={day.toString()}>
         {days}
-      </div>
+      </CalendarWeek>
     );
     days = [];
   }
 
+  const weekdays = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+
   return (
-    <div
-      style={{
-        marginTop: "16px",
-        padding: "12px",
-        background: "#f9fafb",
-        borderRadius: "8px",
-      }}
-    >
-      <h4 style={{ marginBottom: "8px" }}>Calendar</h4>
-      {rows}
-    </div>
+    <CalendarContainer>
+      {/* Weekday Header Labels */}
+      <CalendarWeekdays>
+        {weekdays.map((wd) => (
+          <div key={wd}>{wd}</div>
+        ))}
+      </CalendarWeekdays>
+
+      {/* Date Grid Weeks */}
+      <CalendarWeeks>
+        {rows}
+      </CalendarWeeks>
+    </CalendarContainer>
   );
 }

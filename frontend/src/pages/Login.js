@@ -1,8 +1,19 @@
 import { useState } from "react";
 import { saveToken, saveUser } from "../utils/storage";
 import { authAPI } from "../utils/api";
-import "./login.css";
 import { MdVisibility, MdVisibilityOff } from "react-icons/md";
+import {
+  LoginRoot,
+  LoginHero,
+  LoginContainer,
+  InputGroup,
+  PasswordGroup,
+  PasswordField,
+  PasswordToggle,
+  LoginButton,
+  LoginToggle,
+  LoginError,
+} from "../styles/LoginStyles";
 
 /**
  * Login Component.
@@ -64,19 +75,19 @@ export default function Login({ onLogin }) {
   };
 
   return (
-    <div className="login-root">
+    <LoginRoot>
       {/* Branding Section */}
-      <div className="login-hero">
+      <LoginHero>
         <h1>Smart Companion</h1>
         <p>Turn big tasks into simple, guided steps.</p>
-      </div>
+      </LoginHero>
 
       {/* Form Section */}
-      <div className="login-container">
+      <LoginContainer>
         <h2>{isNewUser ? "Create your account" : "Welcome back"}</h2>
 
         {/* Username Field */}
-        <div className="input-group">
+        <InputGroup>
           <label>
             Username <span style={{ color: "red" }}>*</span>
           </label>
@@ -86,15 +97,15 @@ export default function Login({ onLogin }) {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
           />
-        </div>
+        </InputGroup>
 
         {/* Password Field with Visibility Toggle */}
-        <div className="input-group password-group">
+        <PasswordGroup>
           <label>
             Password <span style={{ color: "red" }}>*</span>
           </label>
 
-          <div className="password-field">
+          <PasswordField>
             <input
               type={showPassword ? "text" : "password"}
               placeholder="Enter password"
@@ -102,24 +113,22 @@ export default function Login({ onLogin }) {
               onChange={(e) => setPassword(e.target.value)}
             />
 
-            <button
+            <PasswordToggle
               type="button"
-              className="password-toggle"
               onClick={() => setShowPassword((prev) => !prev)}
               aria-label={showPassword ? "Hide password" : "Show password"}
               title={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? <MdVisibilityOff /> : <MdVisibility />}
-            </button>
-          </div>
-        </div>
+            </PasswordToggle>
+          </PasswordField>
+        </PasswordGroup>
 
         {/* Error Feedback */}
-        {error && <div className="login-error">{error}</div>}
+        {error && <LoginError>{error}</LoginError>}
 
         {/* Action Button */}
-        <button
-          id="login-btn"
+        <LoginButton
           onClick={handleLogin}
           disabled={loading}
           className={loading ? "loading" : ""}
@@ -131,15 +140,15 @@ export default function Login({ onLogin }) {
             : isNewUser
             ? "Create Account"
             : "Login"}
-        </button>
+        </LoginButton>
 
         {/* Auth Mode Toggle (Login <-> Register) */}
-        <p className="login-toggle" onClick={() => setIsNewUser(!isNewUser)}>
+        <LoginToggle onClick={() => setIsNewUser(!isNewUser)}>
           {isNewUser
             ? "Already have an account? Login"
             : "New user? Create account"}
-        </p>
-      </div>
-    </div>
+        </LoginToggle>
+      </LoginContainer>
+    </LoginRoot>
   );
 }

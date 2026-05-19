@@ -178,10 +178,7 @@ Task:
 
 ${stepRules[profile.stepLevel] || stepRules["medium"]}
 
-Return ONLY the steps as a numbered list. Example format:
-1. First step
-2. Second step
-3. Third step
+Return ONLY the steps as a numbered list
 `;
 
     // Fetch steps from Gemini AI with timeout
@@ -210,9 +207,18 @@ Return ONLY the steps as a numbered list. Example format:
       throw geminiError;
     }
 
+    // Log raw AI response for debugging
+    console.log("\n=== RAW AI RESPONSE ===");
+    console.log(text);
+    console.log("=== END RAW RESPONSE ===\n");
+
     // Process the text to clean up step numbering, empty lines, and filter out AI reasoning
-    const steps = text
-      .split("\n")
+    const allLines = text.split("\n").map((s) => s.trim()).filter(Boolean);
+    console.log("\n=== ALL LINES AFTER SPLIT ===");
+    allLines.forEach((line, idx) => console.log(`Line ${idx + 1}: ${line}`));
+    console.log("=== END ALL LINES ===\n");
+
+    const steps = allLines
       .map((s) => s.replace(/^\d+[.)\s]*/, "").trim())
       .filter(Boolean)
       .filter((s) => {
@@ -224,13 +230,20 @@ Return ONLY the steps as a numbered list. Example format:
           /^step \d+ of \d+/i,  // Progress indicators
           /^\(/,       // Lines starting with parentheses
         ];
-        return !thinkingPatterns.some(pattern => pattern.test(s));
+        const isThinking = thinkingPatterns.some(pattern => pattern.test(s));
+        if (isThinking) {
+          console.log(`FILTERED OUT (thinking): ${s}`);
+        }
+        return !isThinking;
       });
+
+    console.log("\n=== FINAL STEPS ===");
+    steps.forEach((step, idx) => console.log(`Step ${idx + 1}: ${step}`));
+    console.log("=== END FINAL STEPS ===\n");
 
     if (steps.length === 0) {
       throw new Error("No steps generated from AI response");
     }
-    console.log(steps);
     return res.json({ steps });
   } catch (error) {
     console.error("Task Decomposition Error:", error.message);

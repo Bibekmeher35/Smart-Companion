@@ -15,7 +15,8 @@
 // const API_URL = isLocalhost
 //   ? `http://${window.location.hostname}:5050`
 //   : "https://smart-companion-5znk.onrender.com";
-const API_URL = "https://smart-companion-5znk.onrender.com";
+// const API_URL = "https://smart-companion-5znk.onrender.com";
+const API_URL = `http://${window.location.hostname}:5050`;
 /**
  * Helper to retrieve the JWT token from local storage and format it for the Authorization header.
  * @returns {Object} - An object containing the Authorization header or an empty object.

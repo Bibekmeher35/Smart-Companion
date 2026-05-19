@@ -1,5 +1,22 @@
 import { useState } from "react";
 import { MdAdd, MdDelete, MdCheckCircle, MdRadioButtonUnchecked } from "react-icons/md";
+import {
+  TodoListContainer,
+  TodoListHeader,
+  TodoAddBtn,
+  TodoInputContainer,
+  TodoInput,
+  TodoInputActions,
+  TodoInputBtn,
+  TodoEmpty,
+  TodoSection,
+  TodoSectionTitle,
+  TodoList as StyledTodoList,
+  TodoItem,
+  TodoCheckbox,
+  TodoText,
+  TodoDelete,
+} from "../styles/AnalyticsStyles";
 
 /**
  * TodoList Component.
@@ -37,113 +54,108 @@ export default function TodoList({ todos = [], onAddTodo, onToggleTodo, onDelete
   const completedTodos = todos.filter((t) => t.completed);
 
   return (
-    <div className="todo-list-container">
-      <div className="todo-list-header">
+    <TodoListContainer>
+      <TodoListHeader>
         <h4>To-do Lists</h4>
-        <button
-          className="todo-add-btn"
+        <TodoAddBtn
           onClick={() => setShowInput(!showInput)}
           title="Add new to-do"
         >
           <MdAdd />
-        </button>
-      </div>
+        </TodoAddBtn>
+      </TodoListHeader>
 
       {/* Add Todo Form */}
       {showInput && (
-        <div className="todo-input-container">
-          <input
+        <TodoInputContainer>
+          <TodoInput
             type="text"
-            className="todo-input"
             placeholder="Enter your to-do item..."
             value={newTodo}
             onChange={(e) => setNewTodo(e.target.value)}
             onKeyDown={handleKeyPress}
             autoFocus
           />
-          <div className="todo-input-actions">
-            <button className="todo-input-btn todo-input-btn-add" onClick={handleAdd}>
+          <TodoInputActions>
+            <TodoInputBtn className="todo-input-btn-add" onClick={handleAdd}>
               Add
-            </button>
-            <button
-              className="todo-input-btn todo-input-btn-cancel"
+            </TodoInputBtn>
+            <TodoInputBtn
+              className="todo-input-btn-cancel"
               onClick={() => {
                 setNewTodo("");
                 setShowInput(false);
               }}
             >
               Cancel
-            </button>
-          </div>
-        </div>
+            </TodoInputBtn>
+          </TodoInputActions>
+        </TodoInputContainer>
       )}
 
       {/* List Rendering */}
       {todos.length === 0 ? (
-        <div className="todo-empty">
+        <TodoEmpty>
           <p>No to-do items yet.</p>
           <p className="todo-empty-hint">Click the + button to add your first to-do!</p>
-        </div>
+        </TodoEmpty>
       ) : (
         <>
           {/* Pending Items Section */}
           {pendingTodos.length > 0 && (
-            <div className="todo-section">
-              <h5 className="todo-section-title">Pending ({pendingTodos.length})</h5>
-              <ul className="todo-list">
+            <TodoSection>
+              <TodoSectionTitle>Pending ({pendingTodos.length})</TodoSectionTitle>
+              <StyledTodoList>
                 {pendingTodos.map((todo) => (
-                  <li key={todo.id} className="todo-item">
-                    <button
-                      className="todo-checkbox"
+                  <TodoItem key={todo.id}>
+                    <TodoCheckbox
                       onClick={() => onToggleTodo(todo.id)}
                       title="Mark as complete"
                     >
                       <MdRadioButtonUnchecked />
-                    </button>
-                    <span className="todo-text">{todo.text}</span>
-                    <button
-                      className="todo-delete"
+                    </TodoCheckbox>
+                    <TodoText>{todo.text}</TodoText>
+                    <TodoDelete
                       onClick={() => onDeleteTodo(todo.id)}
                       title="Delete to-do"
                     >
                       <MdDelete />
-                    </button>
-                  </li>
+                    </TodoDelete>
+                  </TodoItem>
                 ))}
-              </ul>
-            </div>
+              </StyledTodoList>
+            </TodoSection>
           )}
 
           {/* Completed Items Section */}
           {completedTodos.length > 0 && (
-            <div className="todo-section">
-              <h5 className="todo-section-title">Completed ({completedTodos.length})</h5>
-              <ul className="todo-list">
+            <TodoSection>
+              <TodoSectionTitle>Completed ({completedTodos.length})</TodoSectionTitle>
+              <StyledTodoList>
                 {completedTodos.map((todo) => (
-                  <li key={todo.id} className="todo-item todo-item-completed">
-                    <button
-                      className="todo-checkbox todo-checkbox-completed"
+                  <TodoItem key={todo.id} className="todo-item-completed">
+                    <TodoCheckbox
+                      className="todo-checkbox-completed"
                       onClick={() => onToggleTodo(todo.id)}
                       title="Mark as incomplete"
                     >
                       <MdCheckCircle />
-                    </button>
-                    <span className="todo-text todo-text-completed">{todo.text}</span>
-                    <button
-                      className="todo-delete"
+                    </TodoCheckbox>
+                    <TodoText className="todo-text-completed">{todo.text}</TodoText>
+                    <TodoDelete
                       onClick={() => onDeleteTodo(todo.id)}
                       title="Delete to-do"
                     >
                       <MdDelete />
-                    </button>
-                  </li>
+                    </TodoDelete>
+                  </TodoItem>
                 ))}
-              </ul>
-            </div>
+              </StyledTodoList>
+            </TodoSection>
           )}
         </>
       )}
-    </div>
+    </TodoListContainer>
   );
 }
 

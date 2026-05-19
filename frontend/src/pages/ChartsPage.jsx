@@ -3,12 +3,25 @@ import TasksChart from "../components/TasksChart";
 import TrendChart from "../components/TrendChart";
 import ProgressAreaChart from "../components/ProgressAreaChart";
 import TaskDistributionChart from "../components/TaskDistributionChart";
+import {
+  ChartsPage as StyledChartsPage,
+  ChartsHeader,
+  ChartsTitle,
+  ChartsSubtitle,
+  ChartsGrid,
+  ChartsCard,
+  ChartsCardTitle,
+  ChartsCardSubtitle,
+  HistoryList,
+  HistoryTitle,
+  HistoryDate,
+} from "../styles/AnalyticsStyles";
 
 /**
  * ChartsPage Component.
  * Aggregates user data and prepares it for visualization across multiple chart types.
  */
-export default function ChartsPage({ progress = {}, history = [] }) {
+export default function ChartsPage({ progress = {}, history = [], dyslexiaMode = false }) {
   const tasksCompleted = progress?.tasksCompleted || 0;
 
   /**
@@ -100,88 +113,102 @@ export default function ChartsPage({ progress = {}, history = [] }) {
   }, [history]);
 
   return (
-    <section className="charts-page">
-      <div className="charts-header">
-        <h2 className="charts-title">Charts</h2>
-        <p className="charts-subtitle">
-          Visualize your progress and recent activity.
-        </p>
-      </div>
-
-      <div className="charts-grid">
-        {/* Trend of daily completions */}
-        <div className="card charts-card">
-          <h4 className="charts-card-title">Daily Activity (Last 30 Days)</h4>
-          <p className="charts-card-subtitle">
-            Track your daily task completions over the past month.
-          </p>
-          <TrendChart data={last30Days} />
+    <StyledChartsPage>
+      <ChartsHeader>
+        <div>
+          <ChartsTitle>Charts</ChartsTitle>
+          {!dyslexiaMode && (
+            <ChartsSubtitle>
+              Visualize your progress and recent activity.
+            </ChartsSubtitle>
+          )}
         </div>
+      </ChartsHeader>
+
+      <ChartsGrid>
+        {/* Trend of daily completions */}
+        <ChartsCard>
+          <ChartsCardTitle>Daily Activity (Last 30 Days)</ChartsCardTitle>
+          {!dyslexiaMode && (
+            <ChartsCardSubtitle>
+              Track your daily task completions over the past month.
+            </ChartsCardSubtitle>
+          )}
+          <TrendChart data={last30Days} />
+        </ChartsCard>
 
         {/* Growth of total completions */}
-        <div className="card charts-card">
-          <h4 className="charts-card-title">Cumulative Progress</h4>
-          <p className="charts-card-subtitle">
-            Your total tasks completed over time.
-          </p>
+        <ChartsCard>
+          <ChartsCardTitle>Cumulative Progress</ChartsCardTitle>
+          {!dyslexiaMode && (
+            <ChartsCardSubtitle>
+              Your total tasks completed over time.
+            </ChartsCardSubtitle>
+          )}
           <ProgressAreaChart data={cumulativeProgress} />
-        </div>
+        </ChartsCard>
 
         {/* Breakdown of task complexity */}
         {tasksByCategory.length > 0 && (
-          <div className="card charts-card">
-            <h4 className="charts-card-title">Task Complexity Distribution</h4>
-            <p className="charts-card-subtitle">
-              Breakdown of tasks by number of steps.
-            </p>
+          <ChartsCard>
+            <ChartsCardTitle>Task Complexity Distribution</ChartsCardTitle>
+            {!dyslexiaMode && (
+              <ChartsCardSubtitle>
+                Breakdown of tasks by number of steps.
+              </ChartsCardSubtitle>
+            )}
             <TaskDistributionChart data={tasksByCategory} />
-          </div>
+          </ChartsCard>
         )}
 
         {/* Total stats summary bar chart */}
-        <div className="card charts-card">
-          <h4 className="charts-card-title">Overall Progress</h4>
-          <p className="charts-card-subtitle">
-            Total tasks completed: <strong>{tasksCompleted}</strong>
-          </p>
+        <ChartsCard>
+          <ChartsCardTitle>Overall Progress</ChartsCardTitle>
+          {!dyslexiaMode && (
+            <ChartsCardSubtitle>
+              Total tasks completed: <strong>{tasksCompleted}</strong>
+            </ChartsCardSubtitle>
+          )}
           <TasksChart total={tasksCompleted} />
-        </div>
+        </ChartsCard>
 
         {/* Historical list and chart of latest tasks */}
-        <div className="card charts-card wide">
-          <h4 className="charts-card-title">Recent Tasks</h4>
-          <p className="charts-card-subtitle">
-            Latest items from your task history.
-          </p>
+        <ChartsCard className="wide">
+          <ChartsCardTitle>Recent Tasks</ChartsCardTitle>
+          {!dyslexiaMode && (
+            <ChartsCardSubtitle>
+              Latest items from your task history.
+            </ChartsCardSubtitle>
+          )}
           {recentTasks.length > 0 ? (
             <>
               <TasksChart history={recentTasks} />
-              <ul className="history-list charts-history">
+              <HistoryList>
                 {history
                   .slice(-8)
                   .reverse()
                   .map((item, idx) => (
                     <li key={idx}>
-                      <span className="history-title">
+                      <HistoryTitle>
                         {item?.title && item.title !== "Untitled task"
                           ? item.title
                           : "Untitled task"}
-                      </span>
+                      </HistoryTitle>
                       {item?.completedAt && (
-                        <span className="history-date">
+                        <HistoryDate>
                           {new Date(item.completedAt).toLocaleDateString()}
-                        </span>
+                        </HistoryDate>
                       )}
                     </li>
                   ))}
-              </ul>
+              </HistoryList>
             </>
           ) : (
             <p>No history yet. Complete a task to see charts here.</p>
           )}
-        </div>
-      </div>
-    </section>
+        </ChartsCard>
+      </ChartsGrid>
+    </StyledChartsPage>
   );
 }
 

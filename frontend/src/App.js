@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from "react";
+import { ThemeProvider } from 'styled-components';
 import Login from "./pages/Login";
 import { saveUser, getToken, removeToken, removeUser } from "./utils/storage";
 import { authAPI, taskAPI } from "./utils/api";
 import DashboardLayout from "./pages/DashboardLayout";
+import { GlobalStyles } from './styles/GlobalStyles';
+import { normalTheme, dyslexiaTheme } from './styles/theme';
 
 /**
  * Main Application Component.
@@ -20,15 +23,7 @@ function App() {
 
   // Derive dyslexia mode preference from user profile
   const dyslexiaMode = !!session?.userData?.profile?.dyslexiaMode;
-
-  /**
-   * Effect: Dyslexia Mode Toggle
-   * Applies or removes a CSS class to the root document element based on user preference.
-   */
-  useEffect(() => {
-    if (typeof document === "undefined") return;
-    document.documentElement.classList.toggle("dyslexia-mode", dyslexiaMode);
-  }, [dyslexiaMode]);
+  const theme = dyslexiaMode ? { ...dyslexiaTheme, isDyslexia: true } : { ...normalTheme, isDyslexia: false };
 
   /**
    * Effect: Initial Session Verification
@@ -103,7 +98,19 @@ function App() {
       setTaskFinished(false);
     } catch (err) {
       console.error(err);
-      alert(err.message || "Backend not reachable");
+      
+      // Provide user-friendly error messages
+      let errorMessage = "Unable to break down the task right now.";
+      
+      if (err.message.includes("Rate limit") || err.message.includes("429")) {
+        errorMessage = "Too many requests. Please wait a moment and try again.";
+      } else if (err.message.includes("temporarily unavailable") || err.message.includes("503")) {
+        errorMessage = "The AI service is temporarily unavailable. This usually happens when the server is waking up. Please wait 30 seconds and try again.";
+      } else if (err.message.includes("Network") || err.message.includes("fetch")) {
+        errorMessage = "Network error. Please check your internet connection.";
+      }
+      
+      alert(errorMessage);
     }
   };
 
@@ -118,24 +125,52 @@ function App() {
       return;
     }
 
+    const today = new Date().toISOString().split("T")[0];
+    const completedDates = [...(session.userData?.progress?.completedDates || [])];
+    
+    // Calculate streak based on consecutive days
+    let newStreak = 1;
+    
+    if (!completedDates.includes(today)) {
+      completedDates.push(today);
+      
+      // Sort dates to calculate streak
+      const sortedDates = completedDates.sort();
+      
+      // Calculate consecutive days from today backwards
+      const todayDate = new Date(today);
+      let currentStreak = 1;
+      
+      for (let i = sortedDates.length - 2; i >= 0; i--) {
+        const checkDate = new Date(sortedDates[i]);
+        const expectedDate = new Date(todayDate);
+        expectedDate.setDate(expectedDate.getDate() - currentStreak);
+        
+        // Check if this date is exactly one day before
+        if (checkDate.toISOString().split('T')[0] === expectedDate.toISOString().split('T')[0]) {
+          currentStreak++;
+        } else {
+          break;
+        }
+      }
+      
+      newStreak = currentStreak;
+    } else {
+      // If already completed today, keep existing streak
+      newStreak = session.userData?.progress?.currentStreak || 1;
+    }
+
     // Task completion logic
     const updated = {
       ...session.userData,
       progress: {
         tasksCompleted: (session.userData?.progress?.tasksCompleted || 0) + 1,
-        currentStreak: (session.userData?.progress?.currentStreak || 0) + 1,
-        completedDates: [...(session.userData?.progress?.completedDates || [])],
+        currentStreak: newStreak,
+        completedDates: completedDates,
       },
       rewards: [...(session.userData?.rewards || [])],
       history: [...(session.userData?.history || [])],
     };
-
-    const today = new Date().toISOString().split("T")[0];
-
-    // Update streak dates
-    if (!updated.progress.completedDates.includes(today)) {
-      updated.progress.completedDates.push(today);
-    }
 
     // Add task to history
     updated.history.push({
@@ -161,7 +196,7 @@ function App() {
     }
 
     if (
-      updated.progress.currentStreak === 3 &&
+      updated.progress.currentStreak >= 3 &&
       !updated.rewards.includes("3-Day Streak")
     ) {
       updated.rewards.push("3-Day Streak");
@@ -183,6 +218,15 @@ function App() {
   };
 
   /**
+   * Goes back to the previous step.
+   */
+  const goToPreviousStep = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex((prev) => prev - 1);
+    }
+  };
+
+  /**
    * Resets the active task session to allow starting a new task.
    */
   const resetTaskSession = () => {
@@ -197,9 +241,6 @@ function App() {
    * Handles user logout, clearing local storage and session state.
    */
   const logout = () => {
-    if (typeof document !== "undefined") {
-      document.documentElement.classList.remove("dyslexia-mode");
-    }
     removeToken();
     removeUser();
     resetTaskSession();
@@ -281,7 +322,8 @@ function App() {
 
   // --- Main Application Render ---
   return (
-    <div style={{ minHeight: "100vh", background: "#f4f6f8" }}>
+    <ThemeProvider theme={theme}>
+      <GlobalStyles />
       <DashboardLayout
         username={session?.username}
         progress={session?.userData?.progress || {}}
@@ -314,10 +356,11 @@ function App() {
         currentIndex={currentIndex}
         sendTask={sendTask}
         markDone={markDone}
+        goToPreviousStep={goToPreviousStep}
         taskFinished={taskFinished}
         resetTaskSession={resetTaskSession}
       />
-    </div>
+    </ThemeProvider>
   );
 }
 

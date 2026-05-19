@@ -35,10 +35,7 @@ export default function TasksChart({ total = 0, history = [] }) {
         {/* Horizontal Axis: Labels for the bars */}
         <XAxis 
           dataKey="name" 
-          tick={{ fontSize: 12 }}
-          angle={-45} // Tilt labels for better readability
-          textAnchor="end"
-          height={60}
+          tick={{ fontSize: 11, fill: '#64748b' }}
         />
         
         {/* Vertical Axis: Task counts */}

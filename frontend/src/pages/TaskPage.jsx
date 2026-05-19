@@ -12,6 +12,7 @@ export default function TaskPage({
   currentIndex,
   sendTask,
   markDone,
+  goToPreviousStep,
   taskFinished,
   resetTaskSession,
   onBack,
@@ -134,26 +135,69 @@ export default function TaskPage({
             borderRadius: "8px",
           }}
         >
-          <p>
+          <p style={{ marginBottom: "12px", fontSize: "14px", color: "#6b7280" }}>
             Step {currentIndex + 1} of {steps.length}
           </p>
 
-          <h3>{steps[currentIndex]}</h3>
+          <h3 style={{ marginBottom: "20px", lineHeight: "1.5" }}>{steps[currentIndex]}</h3>
 
-          <button
-            onClick={handleMarkDone}
-            style={{
-              marginTop: "15px",
-              background: "#10b981",
-              color: "white",
-              border: "none",
-              padding: "8px 14px",
-              borderRadius: "6px",
-              cursor: "pointer",
-            }}
-          >
-            {isLastStep ? "Mark Final Step" : "Mark as Done"}
-          </button>
+          <div style={{ 
+            display: "flex", 
+            gap: "12px", 
+            marginTop: "20px",
+            flexWrap: "wrap",
+            alignItems: "stretch"
+          }}>
+            {currentIndex > 0 && (
+              <button
+                onClick={goToPreviousStep}
+                style={{
+                  background: "#6b7280",
+                  color: "white",
+                  border: "none",
+                  padding: "12px 20px",
+                  borderRadius: "8px",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "8px",
+                  fontSize: "15px",
+                  fontWeight: "500",
+                  transition: "all 0.2s ease",
+                  minWidth: "140px",
+                  flex: "1",
+                }}
+                onMouseEnter={(e) => e.target.style.background = "#4b5563"}
+                onMouseLeave={(e) => e.target.style.background = "#6b7280"}
+              >
+                ← Previous Step
+              </button>
+            )}
+            <button
+              onClick={handleMarkDone}
+              style={{
+                background: "#10b981",
+                color: "white",
+                border: "none",
+                padding: "12px 20px",
+                borderRadius: "8px",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "15px",
+                fontWeight: "500",
+                transition: "all 0.2s ease",
+                minWidth: "140px",
+                flex: currentIndex === 0 ? "1" : "1",
+              }}
+              onMouseEnter={(e) => e.target.style.background = "#059669"}
+              onMouseLeave={(e) => e.target.style.background = "#10b981"}
+            >
+              {isLastStep ? "Mark Final Step" : "Mark as Done"}
+            </button>
+          </div>
         </div>
       )}
 

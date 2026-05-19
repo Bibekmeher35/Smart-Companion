@@ -1,0 +1,88 @@
+export const baseTheme = {
+  colors: {
+    primary: '#4f46e5',
+    secondary: '#5FB3B3',
+    accent: '#F9D56E',
+    purple: '#9B7EBD',
+    danger: '#ef4444',
+    success: '#10b981',
+    warning: '#f59e0b',
+    info: '#06b6d4',
+    dark: '#0f172a',
+    light: '#ffffff',
+    gray: {
+      50: '#f9fafb',
+      100: '#f3f4f6',
+      200: '#e5e7eb',
+      300: '#d1d5db',
+      400: '#9ca3af',
+      500: '#6b7280',
+      600: '#4b5563',
+      700: '#374151',
+      800: '#1f2937',
+      900: '#111827',
+    },
+  },
+  spacing: (multiplier) => `${multiplier * 8}px`,
+  borderRadius: {
+    sm: '8px',
+    md: '12px',
+    lg: '20px',
+    xl: '24px',
+    full: '999px',
+  },
+};
+
+export const dyslexiaTheme = {
+  ...baseTheme,
+  fontFamily: "'Lexend', 'Comic Neue', 'Comic Sans MS', Arial, sans-serif",
+  letterSpacing: '0.12em',
+  wordSpacing: '0.22em',
+  lineHeight: 1.85,
+  fontSize: {
+    base: '1.12rem',
+    h1: '2.6rem',
+    h2: '2.2rem',
+    h3: '1.8rem',
+    h4: '1.45rem',
+  },
+  colors: {
+    ...baseTheme.colors,
+    text: '#1e1b4b',
+    background: 'radial-gradient(circle at 50% 50%, #f4f7ff 0%, #e0e7ff 60%, #dbeafe 100%)',
+    cardBg: 'rgba(255, 255, 255, 0.9)',
+    cardBorder: '#c7d2fe',
+    sidebarBg: '#eef2ff',
+    topbarBg: 'rgba(244, 247, 255, 0.9)',
+  },
+  animations: {
+    float: 'float 4s ease-in-out infinite',
+    wiggle: 'wiggle 1.2s ease-in-out infinite',
+    pulse: 'activePulse 2s infinite',
+    shine: 'shine 2.5s infinite linear',
+  },
+};
+
+export const normalTheme = {
+  ...baseTheme,
+  fontFamily: "'Plus Jakarta Sans', 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+  letterSpacing: 'normal',
+  wordSpacing: 'normal',
+  lineHeight: 1.5,
+  fontSize: {
+    base: '1rem',
+    h1: '1.8rem',
+    h2: '1.5rem',
+    h3: '1.25rem',
+    h4: '1.1rem',
+  },
+  colors: {
+    ...baseTheme.colors,
+    text: '#0f172a',
+    background: 'radial-gradient(circle at 10% 20%, rgb(255, 246, 240) 0%, rgb(255, 235, 226) 90.1%)',
+    cardBg: '#ffffff',
+    cardBorder: 'rgba(15, 23, 42, 0.06)',
+    sidebarBg: 'linear-gradient(180deg, #1e293b 0%, #0f172a 100%)',
+    topbarBg: 'rgba(255, 255, 255, 0.8)',
+  },
+};

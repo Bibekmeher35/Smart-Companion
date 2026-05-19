@@ -1,16 +1,13 @@
-import "./dashboard.css";
-import "./dashboard-responsive.css";
+import React, { useEffect, useState, useMemo, useRef } from "react";
 import Calendar from "../components/Calendar";
 import TasksChart from "../components/TasksChart";
 import TaskPage from "./TaskPage";
 import ProfileSettings from "./ProfileSettings";
 import AnalyticsPage from "./AnalyticsPage";
 import ChartsPage from "./ChartsPage";
-import { saveUser } from "../utils/storage";
 import { authAPI } from "../utils/api";
 import TodoList from "../components/TodoList";
 import SearchModal from "../components/SearchModal";
-import { useEffect, useMemo, useRef, useState } from "react";
 import {
   MdHome,
   MdChecklist,
@@ -22,18 +19,80 @@ import {
   MdSmartToy,
   MdNotifications,
   MdAccountCircle,
+  MdChevronLeft,
+  MdChevronRight,
+  MdEmojiEvents,
+  MdTrackChanges,
+  MdLocalFireDepartment,
+  MdFactCheck,
 } from "react-icons/md";
+import {
+  DashboardRoot,
+  Sidebar,
+  SidebarHeader,
+  Brand,
+  BrandLogo,
+  BrandText,
+  SidebarToggle,
+  SideList,
+  NavItem,
+  NavIcon,
+  NavLabel,
+  SideFull,
+  LogoutButton,
+  LogoutIcon,
+  LogoutLabel,
+  SidebarBackdrop,
+  DashboardMain,
+  Topbar,
+  MobileMenuBtn,
+  TopbarTitle,
+  TopbarGreeting,
+  TopbarUsername,
+  TopbarSubtitle,
+  TopActions,
+  SearchBarWrapper,
+  SearchBarInput,
+  SearchBarKbd,
+  TopIcon,
+} from '../styles/DashboardStyles';
+import {
+  Card,
+  Stats,
+  StatCard,
+  StatCardContent,
+  StatCardLabel,
+  StatCardValue,
+  StatCardIcon,
+  Grid,
+  GridLeft,
+  SettingsSection,
+  SettingsCard,
+  SettingsSubtitle,
+  ProfileDropdown,
+  ProfileDropdownHeader,
+  ProfileDropdownClose,
+  ProfileSummary,
+  ProfileSummaryName,
+  ProfileSummaryMeta,
+  ChangePassword,
+  ChangePasswordTitle,
+  ChangePasswordSubtitle,
+  ChangePasswordForm,
+  ChangePasswordLabel,
+  ChangePasswordInput,
+  ChangePasswordStatus,
+  ChangePasswordButton,
+} from '../styles/ComponentStyles';
 
-/**
- * ChangePasswordSection Component.
- * Handles the logic and UI for updating the user's password.
- */
-function ChangePasswordSection({ username }) {
+function ChangePasswordSection({ username, profile }) {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  const dyslexiaMode = !!profile?.dyslexiaMode;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -88,68 +147,57 @@ function ChangePasswordSection({ username }) {
   };
 
   return (
-    <div className="change-password">
-      <h5 className="change-password-title">Change password</h5>
-      <p className="change-password-subtitle">
-        Update your password securely. You&apos;ll use the new password next
-        time you sign in.
-      </p>
-      <form className="change-password-form" onSubmit={handleSubmit}>
-        <label className="change-password-label">
-          Current password
-          <input
+    <ChangePassword>
+      <ChangePasswordTitle>
+        {dyslexiaMode ? "🔑 Change Password" : "Change password"}
+      </ChangePasswordTitle>
+      {!dyslexiaMode && (
+        <ChangePasswordSubtitle>
+          Update your password securely. You&apos;ll use the new password next
+          time you sign in.
+        </ChangePasswordSubtitle>
+      )}
+      <ChangePasswordForm onSubmit={handleSubmit}>
+        <ChangePasswordLabel>
+          {dyslexiaMode ? "🔒 Current password" : "Current password"}
+          <ChangePasswordInput
             type="password"
-            className="change-password-input"
+            placeholder={dyslexiaMode ? "Type your current password..." : ""}
             value={currentPassword}
             onChange={(e) => setCurrentPassword(e.target.value)}
           />
-        </label>
-        <label className="change-password-label">
-          New password
-          <input
+        </ChangePasswordLabel>
+        <ChangePasswordLabel>
+          {dyslexiaMode ? "✨ New password (at least 6 characters)" : "New password"}
+          <ChangePasswordInput
             type="password"
-            className="change-password-input"
+            placeholder={dyslexiaMode ? "Type a strong new password..." : ""}
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
           />
-        </label>
-        <label className="change-password-label">
-          Confirm new password
-          <input
+        </ChangePasswordLabel>
+        <ChangePasswordLabel>
+          {dyslexiaMode ? "✅ Confirm new password" : "Confirm new password"}
+          <ChangePasswordInput
             type="password"
-            className="change-password-input"
+            placeholder={dyslexiaMode ? "Retype your new password..." : ""}
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
-        </label>
+        </ChangePasswordLabel>
         {status && (
-          <div
-            className={
-              status.type === "success"
-                ? "change-password-status success"
-                : "change-password-status error"
-            }
-          >
+          <ChangePasswordStatus $type={status.type}>
             {status.message}
-          </div>
+          </ChangePasswordStatus>
         )}
-        <button
-          type="submit"
-          className="change-password-button"
-          disabled={loading}
-        >
-          {loading ? "Updating..." : "Update password"}
-        </button>
-      </form>
-    </div>
+        <ChangePasswordButton type="submit" disabled={loading}>
+          {loading ? "Updating..." : (dyslexiaMode ? "🔄 Update Password Securely" : "Update password")}
+        </ChangePasswordButton>
+      </ChangePasswordForm>
+    </ChangePassword>
   );
 }
 
-/**
- * DashboardLayout Component.
- * The primary layout wrapper that provides navigation (sidebar), header (topbar),
- * and dynamically renders content based on the selected menu item.
- */
 export default function DashboardLayout({
   username,
   progress,
@@ -167,35 +215,27 @@ export default function DashboardLayout({
   currentIndex,
   sendTask,
   markDone,
+  goToPreviousStep,
   taskFinished,
   resetTaskSession,
 }) {
-  // --- Sidebar & Navigation State ---
   const [sidebarOpen, setSidebarOpen] = useState(() => {
     if (typeof window === "undefined") return true;
-    return window.innerWidth >= 992; // Default open on large screens
+    return window.innerWidth >= 992;
   });
 
-  const [activeItem, setActiveItem] = useState("dashboard"); // Controls which page is displayed
-  const [now, setNow] = useState(() => new Date()); // Drives the real-time clock in the header
-  const [showProfilePanel, setShowProfilePanel] = useState(false); // Profile dropdown visibility
-  const [showSearchModal, setShowSearchModal] = useState(false); // Global search modal visibility
-  const profileDropdownRef = useRef(null); // Ref for handling clicks outside the profile panel
+  const [activeItem, setActiveItem] = useState("dashboard");
+  const [now, setNow] = useState(() => new Date());
+  const [showProfilePanel, setShowProfilePanel] = useState(false);
+  const [showSearchModal, setShowSearchModal] = useState(false);
+  const profileDropdownRef = useRef(null);
 
-  const tasksCompleted = progress?.tasksCompleted || 0;
-
-  /**
-   * Effect: Real-time clock tick every minute.
-   */
   useEffect(() => {
     const tick = () => setNow(new Date());
     const id = window.setInterval(tick, 60 * 1000);
     return () => window.clearInterval(id);
   }, []);
 
-  /**
-   * Effect: Global Shortcut for Search (CMD+K or CTRL+K).
-   */
   useEffect(() => {
     const handleKeyDown = (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
@@ -208,9 +248,6 @@ export default function DashboardLayout({
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  /**
-   * Effect: Close profile panel when clicking outside.
-   */
   useEffect(() => {
     if (!showProfilePanel) return;
 
@@ -229,31 +266,6 @@ export default function DashboardLayout({
     };
   }, [showProfilePanel]);
 
-  /**
-   * Memoized Value: Recent History Labels
-   * Formats the last 3 tasks for display in the dashboard summary.
-   */
-  const recentHistory = useMemo(() => {
-    if (!Array.isArray(history) || history.length === 0) return [];
-    const lastThree = history.slice(-3);
-    return lastThree.map((item, idx) => {
-      const indexNumber = history.length - (lastThree.length - 1 - idx);
-      const title =
-        item.title && item.title !== "Untitled task"
-          ? item.title
-          : `Task ${indexNumber}`;
-
-      return {
-        label: title,
-        value: item.tasksCompleted || tasksCompleted,
-        completedAt: item.completedAt,
-      };
-    });
-  }, [history, tasksCompleted]);
-
-  /**
-   * Memoized Value: Formatted Time Label for Topbar.
-   */
   const nowLabel = useMemo(() => {
     return now.toLocaleString(undefined, {
       hour: "2-digit",
@@ -264,9 +276,6 @@ export default function DashboardLayout({
     });
   }, [now]);
 
-  /**
-   * Memoized Value: Contextual Greeting based on time of day.
-   */
   const greeting = useMemo(() => {
     const hour = now.getHours();
     if (hour >= 5 && hour < 12) return "Good Morning";
@@ -277,169 +286,88 @@ export default function DashboardLayout({
 
   const displayName = (username || "").trim() || "there";
 
+  const navItems = [
+    { id: "dashboard", icon: MdHome, label: "Home" },
+    { id: "task", icon: MdChecklist, label: "Task" },
+    { id: "analytics", icon: MdInsights, label: "Analytics" },
+    { id: "charts", icon: MdShowChart, label: "Charts" },
+    { id: "settings", icon: MdSettings, label: "Settings" },
+  ];
+
   return (
-    <div className="dashboard-root">
-      {/* Sidebar Navigation */}
-      <aside className={`sidebar ${sidebarOpen ? "open" : "closed"}`}>
-        <div className="sidebar-header">
-          <div className="brand">
-            <span className="brand-logo">
+    <DashboardRoot>
+      <Sidebar $open={sidebarOpen}>
+        <SidebarHeader $closed={!sidebarOpen}>
+          <Brand $closed={!sidebarOpen}>
+            <BrandLogo>
               <MdSmartToy />
-            </span>
-            {sidebarOpen && (
-              <span className="brand-text">Smart Companion</span>
-            )}
-          </div>
-          <button
-            className="sidebar-toggle"
+            </BrandLogo>
+            {sidebarOpen && <BrandText>Smart Companion</BrandText>}
+          </Brand>
+          <SidebarToggle
             onClick={() => setSidebarOpen((prev) => !prev)}
+            aria-label={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
           >
-            {sidebarOpen ? "«" : "»"}
-          </button>
-        </div>
+            {sidebarOpen ? <MdChevronLeft /> : <MdChevronRight />}
+          </SidebarToggle>
+        </SidebarHeader>
 
-        <nav className="sideList">
-          <button
-            className={`nav-item nav-item-home ${
-              activeItem === "dashboard" ? "active" : ""
-            }`}
-            onClick={() => {
-              setShowProfilePanel(false);
-              setActiveItem("dashboard");
-            }}
-          >
-            <span className="nav-icon">
-              <MdHome />
-            </span>
-            <span className="nav-label">Home</span>
-          </button>
+        <SideList $closed={!sidebarOpen}>
+          {navItems.map((item, index) => {
+            const Icon = item.icon;
+            const isActive = activeItem === item.id;
+            return (
+              <NavItem
+                key={item.id}
+                $active={isActive}
+                $closed={!sidebarOpen}
+                onClick={() => {
+                  setShowProfilePanel(false);
+                  setActiveItem(item.id);
+                }}
+              >
+                <NavIcon $closed={!sidebarOpen} $active={isActive} $index={index}>
+                  <Icon />
+                </NavIcon>
+                <NavLabel $closed={!sidebarOpen}>{item.label}</NavLabel>
+              </NavItem>
+            );
+          })}
+        </SideList>
 
-          <button
-            className={`nav-item nav-item-task ${
-              activeItem === "task" ? "active" : ""
-            }`}
-            onClick={() => {
-              setShowProfilePanel(false);
-              setActiveItem("task");
-            }}
-          >
-            <span className="nav-icon">
-              <MdChecklist />
-            </span>
-            <span className="nav-label">Task</span>
-          </button>
-
-          <button
-            className={`nav-item nav-item-analytics ${
-              activeItem === "analytics" ? "active" : ""
-            }`}
-            onClick={() => {
-              setShowProfilePanel(false);
-              setActiveItem("analytics");
-            }}
-          >
-            <span className="nav-icon">
-              <MdInsights />
-            </span>
-            <span className="nav-label">Analytics</span>
-          </button>
-          <button
-            className={`nav-item nav-item-charts ${
-              activeItem === "charts" ? "active" : ""
-            }`}
-            onClick={() => {
-              setShowProfilePanel(false);
-              setActiveItem("charts");
-            }}
-          >
-            <span className="nav-icon">
-              <MdShowChart />
-            </span>
-            <span className="nav-label">Charts</span>
-          </button>
-          <button
-            className={`nav-item nav-item-settings ${
-              activeItem === "settings" ? "active" : ""
-            }`}
-            onClick={() => {
-              setShowProfilePanel(false);
-              setActiveItem("settings");
-            }}
-          >
-            <span className="nav-icon">
-              <MdSettings />
-            </span>
-            <span className="nav-label">Settings</span>
-          </button>
-        </nav>
-
-        <div className="sideFull">
-          <button
-            className="logout"
-            onClick={() => {
-              if (onLogout) onLogout();
-            }}
-          >
-            <span className="logout-icon">
+        <SideFull $closed={!sidebarOpen}>
+          <LogoutButton $closed={!sidebarOpen} onClick={() => { if (onLogout) onLogout(); }}>
+            <LogoutIcon $closed={!sidebarOpen}>
               <MdLogout />
-            </span>
-            <span className="logout-label">Log out</span>
-          </button>
-        </div>
-      </aside>
+            </LogoutIcon>
+            <LogoutLabel $closed={!sidebarOpen}>Log out</LogoutLabel>
+          </LogoutButton>
+        </SideFull>
+      </Sidebar>
 
-      {sidebarOpen && (
-        <button
-          type="button"
-          className="sidebar-backdrop"
-          aria-label="Close menu"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
+      <SidebarBackdrop $show={sidebarOpen} onClick={() => setSidebarOpen(false)} aria-label="Close menu" />
 
-      <main
-        className="dashboard-main"
-        style={{
-          marginLeft: sidebarOpen ? "236px" : "80px",
-          width: sidebarOpen ? "calc(100% - 236px)" : "calc(100% - 80px)",
-          transition: "margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1), width 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-        }}
-      >
-        {/* Topbar: Branding, Search, and Profile Actions */}
-        <header className="topbar">
-          <button
-            type="button"
-            className="mobile-menu-btn"
-            onClick={() => setSidebarOpen(true)}
-            aria-label="Open menu"
-          >
+      <DashboardMain $sidebarOpen={sidebarOpen}>
+        <Topbar>
+          <MobileMenuBtn onClick={() => setSidebarOpen(true)} aria-label="Open menu">
             <MdMenu />
-          </button>
+          </MobileMenuBtn>
 
-          <div className="topbar-title">
-            <h1 className="topbar-greeting">
-              {greeting}, <span className="topbar-username">{displayName}</span>
-            </h1>
-            <p>{nowLabel}</p>
-          </div>
+          <TopbarTitle>
+            <TopbarGreeting>
+              {greeting}, <TopbarUsername>{displayName}</TopbarUsername>
+            </TopbarGreeting>
+            <TopbarSubtitle>{nowLabel}</TopbarSubtitle>
+          </TopbarTitle>
 
-          <div className="top-actions">
-            {/* Search Input (Triggers Modal) */}
-            <div
-              className="search-bar-wrapper"
-              onClick={() => setShowSearchModal(true)}
-            >
-              <input
-                placeholder="Search..."
-                readOnly
-                className="search-bar-input"
-              />
-              <kbd className="search-bar-kbd">⌘K</kbd>
-            </div>
-            
-            <button
-              type="button"
-              className="top-icon top-icon-notification"
+          <TopActions>
+            <SearchBarWrapper onClick={() => setShowSearchModal(true)}>
+              <SearchBarInput placeholder="Search..." readOnly />
+              <SearchBarKbd>⌘K</SearchBarKbd>
+            </SearchBarWrapper>
+
+            <TopIcon
+              className="notification"
               aria-label="Notifications"
               onClick={() => {
                 setShowProfilePanel(false);
@@ -447,46 +375,40 @@ export default function DashboardLayout({
               }}
             >
               <MdNotifications />
-            </button>
-            
-            <button
-              type="button"
-              className="top-icon top-icon-profile"
+            </TopIcon>
+
+            <TopIcon
+              className="profile"
               aria-label="Profile"
               aria-expanded={showProfilePanel}
               onClick={() => setShowProfilePanel((prev) => !prev)}
             >
               <MdAccountCircle />
-            </button>
-          </div>
-        </header>
+            </TopIcon>
+          </TopActions>
+        </Topbar>
 
         {showProfilePanel && (
-          <div className="profile-dropdown" ref={profileDropdownRef}>
-            <div className="profile-dropdown-header">
+          <ProfileDropdown ref={profileDropdownRef}>
+            <ProfileDropdownHeader>
               <div>
-                <div className="profile-summary-name">{displayName}</div>
-                <div className="profile-summary-meta">
+                <ProfileSummaryName>{displayName}</ProfileSummaryName>
+                <ProfileSummaryMeta>
                   Tasks completed: <span>{progress?.tasksCompleted || 0}</span>
-                </div>
+                </ProfileSummaryMeta>
               </div>
-              <button
-                type="button"
-                className="profile-dropdown-close"
+              <ProfileDropdownClose
                 aria-label="Close profile panel"
                 onClick={() => setShowProfilePanel(false)}
               >
                 ✕
-              </button>
-            </div>
-            <ChangePasswordSection username={username} />
-          </div>
+              </ProfileDropdownClose>
+            </ProfileDropdownHeader>
+            <ChangePasswordSection username={username} profile={profile} />
+          </ProfileDropdown>
         )}
 
-        {/* --- Main Content Routing --- */}
-        
         {activeItem === "task" ? (
-          // Task Decomposition & Execution View
           <TaskPage
             task={task}
             setTask={setTask}
@@ -494,98 +416,159 @@ export default function DashboardLayout({
             currentIndex={currentIndex}
             sendTask={sendTask}
             markDone={markDone}
+            goToPreviousStep={goToPreviousStep}
             taskFinished={taskFinished}
             resetTaskSession={resetTaskSession}
             onBack={() => setActiveItem("dashboard")}
           />
         ) : activeItem === "analytics" ? (
-          // Detailed Productivity Analytics
           <AnalyticsPage
             username={username}
             progress={progress || {}}
             history={history || []}
+            dyslexiaMode={!!profile?.dyslexiaMode}
           />
         ) : activeItem === "charts" ? (
-          // Visual Charts & Historical Trends
-          <ChartsPage progress={progress || {}} history={history || []} />
+          <ChartsPage
+            progress={progress || {}}
+            history={history || []}
+            dyslexiaMode={!!profile?.dyslexiaMode}
+          />
         ) : activeItem === "settings" ? (
-          // User Profile & App Preferences
-          <section className="settings-section">
-            <div className="card settings-card">
+          <SettingsSection>
+            <SettingsCard>
               <h4>Profile & Preferences</h4>
-              <p className="settings-subtitle">
-                Tune how Smart Companion breaks down your tasks.
-              </p>
+              {!profile?.dyslexiaMode && (
+                <SettingsSubtitle>
+                  Tune how Smart Companion breaks down your tasks.
+                </SettingsSubtitle>
+              )}
               <ProfileSettings profile={profile || {}} onSave={updateProfile} />
-            </div>
+            </SettingsCard>
 
-            <div className="card settings-card">
-              <h4>Account & Security</h4>
-              <p className="settings-subtitle">
-                View your basic account info and update your password.
-              </p>
-              <div className="profile-summary settings-profile-summary">
-                <div className="profile-summary-name">{displayName}</div>
-                <div className="profile-summary-meta">
-                  Username: <span>{username || "Unknown"}</span>
+            <SettingsCard>
+              <h4>{profile?.dyslexiaMode ? "🔒 Account & Security" : "Account & Security"}</h4>
+              {!profile?.dyslexiaMode && (
+                <SettingsSubtitle>
+                  View your basic account info and update your password.
+                </SettingsSubtitle>
+              )}
+              
+              {profile?.dyslexiaMode ? (
+                <div style={{
+                  background: "#ffffff",
+                  border: "4px solid #c7d2fe",
+                  borderRadius: "24px",
+                  padding: "24px",
+                  marginBottom: "24px",
+                  boxShadow: "0 10px 25px rgba(99, 102, 241, 0.05)"
+                }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px", fontSize: "1.45rem", fontWeight: "900", color: "#1e1b4b" }}>
+                    👤 {displayName}
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginTop: "16px", borderTop: "2px dashed #c7d2fe", paddingTop: "16px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", fontWeight: "900", fontSize: "1.2rem", color: "#1e1b4b" }}>
+                      🏆 Achievement: <span style={{ color: "#6366f1", fontWeight: "900" }}>{progress?.tasksCompleted || 0} Done</span>
+                    </div>
+                    <div style={{ marginTop: "6px", background: "#e0e7ff", borderRadius: "10px", height: "18px", width: "100%", overflow: "hidden", border: "1px solid #c7d2fe" }}>
+                      <div style={{
+                        background: "linear-gradient(90deg, #6366f1 0%, #818cf8 100%)",
+                        height: "100%",
+                        width: `${Math.min(100, Math.max(10, ((progress?.tasksCompleted || 0) % 10) * 10))}%`,
+                        borderRadius: "10px",
+                        transition: "width 0.4s ease"
+                      }} />
+                    </div>
+                    <div style={{ fontSize: "1rem", color: "#6366f1", fontWeight: "800", display: "flex", justifyContent: "space-between", marginTop: "4px" }}>
+                      <span>Level {Math.floor((progress?.tasksCompleted || 0) / 10) + 1} Planner</span>
+                      <span>Next Rank: {10 - ((progress?.tasksCompleted || 0) % 10)} Tasks remaining! 🌟</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="profile-summary-meta">
-                  Tasks completed: <span>{progress?.tasksCompleted || 0}</span>
-                </div>
-              </div>
-              <ChangePasswordSection username={username} />
-            </div>
-          </section>
+              ) : (
+                <ProfileSummary style={{ marginBottom: "16px" }}>
+                  <ProfileSummaryName>{displayName}</ProfileSummaryName>
+                  <ProfileSummaryMeta>
+                    Username: <span>{username || "Unknown"}</span>
+                  </ProfileSummaryMeta>
+                  <ProfileSummaryMeta>
+                    Tasks completed: <span>{progress?.tasksCompleted || 0}</span>
+                  </ProfileSummaryMeta>
+                </ProfileSummary>
+              )}
+              
+              <ChangePasswordSection username={username} profile={profile} />
+            </SettingsCard>
+          </SettingsSection>
         ) : (
-          // Default Dashboard (Home) View
           <>
-            {/* Rapid Stat Overview */}
-            <section className="stats">
-              <div className="stat green">
-                Points <b>{progress?.tasksCompleted * 10 || 0}</b>
-              </div>
+            <Stats>
+              <StatCard $variant="points">
+                <StatCardContent>
+                  <StatCardLabel>Points Earned</StatCardLabel>
+                  <StatCardValue>{progress?.tasksCompleted * 10 || 0}</StatCardValue>
+                </StatCardContent>
+                <StatCardIcon>
+                  <MdEmojiEvents />
+                </StatCardIcon>
+              </StatCard>
 
-              <div className="stat green">
-                Today’s Target <b>{progress?.dailyTarget || 100}</b>
-              </div>
+              <StatCard $variant="target">
+                <StatCardContent>
+                  <StatCardLabel>Today's Target</StatCardLabel>
+                  <StatCardValue>{progress?.dailyTarget || 100} XP</StatCardValue>
+                </StatCardContent>
+                <StatCardIcon>
+                  <MdTrackChanges />
+                </StatCardIcon>
+              </StatCard>
 
-              <div className="stat green">
-                Current Streak <b>{progress?.currentStreak || 0}</b>
-              </div>
+              <StatCard $variant="streak">
+                <StatCardContent>
+                  <StatCardLabel>Current Streak</StatCardLabel>
+                  <StatCardValue>{progress?.currentStreak || 0} Days</StatCardValue>
+                </StatCardContent>
+                <StatCardIcon>
+                  <MdLocalFireDepartment />
+                </StatCardIcon>
+              </StatCard>
 
-              <div className="stat purple">
-                Total Tasks <b>{progress?.tasksCompleted || 0}</b>
-              </div>
-            </section>
+              <StatCard $variant="total">
+                <StatCardContent>
+                  <StatCardLabel>Total Tasks Completed</StatCardLabel>
+                  <StatCardValue>{progress?.tasksCompleted || 0}</StatCardValue>
+                </StatCardContent>
+                <StatCardIcon>
+                  <MdFactCheck />
+                </StatCardIcon>
+              </StatCard>
+            </Stats>
 
-            <section className="grid">
-              <div className="grid-left">
-                {/* To-do List Card */}
-                <div className="card wide">
+            <Grid>
+              <GridLeft>
+                <Card className="wide">
                   <TodoList
                     todos={todos}
                     onAddTodo={onAddTodo}
                     onToggleTodo={onToggleTodo}
                     onDeleteTodo={onDeleteTodo}
                   />
-                </div>
+                </Card>
 
-                {/* Progress Chart Card */}
-                <div className="card wide">
+                <Card className="wide">
                   <h4>Tasks Completed</h4>
                   <TasksChart total={progress?.tasksCompleted || 0} />
-                </div>
-              </div>
+                </Card>
+              </GridLeft>
 
-              {/* Monthly Activity Calendar */}
-              <div className="card calendar">
-                <h4 style={{ textAlign: "center" }}>Calendar</h4>
+              <Card style={{ textAlign: "center" }}>
+                <h4>Calendar</h4>
                 <Calendar completedDates={progress?.completedDates || []} />
-              </div>
-            </section>
+              </Card>
+            </Grid>
           </>
         )}
-      </main>
+      </DashboardMain>
 
       <SearchModal
         isOpen={showSearchModal}
@@ -594,9 +577,8 @@ export default function DashboardLayout({
         todos={todos}
         onNavigate={(item) => {
           setShowSearchModal(false);
-          // Handle navigation based on item type
         }}
       />
-    </div>
+    </DashboardRoot>
   );
 }

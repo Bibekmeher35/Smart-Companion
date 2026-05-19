@@ -14,12 +14,27 @@ import {
   PolarRadiusAxis,
   Radar,
 } from "recharts";
+import {
+  AnalyticsPage as StyledAnalyticsPage,
+  AnalyticsHeader,
+  AnalyticsTitle,
+  AnalyticsSubtitle,
+  AnalyticsMetrics,
+  AnalyticsMetric,
+  AnalyticsMetricLabel,
+  AnalyticsMetricValue,
+  AnalyticsGrid,
+  AnalyticsCard,
+  AnalyticsCardTitle,
+  AnalyticsCardSubtitle,
+  AnalyticsTips,
+} from "../styles/AnalyticsStyles";
 
 /**
  * AnalyticsPage Component.
  * Displays deep insights into user productivity using multiple chart types.
  */
-export default function AnalyticsPage({ username, progress = {}, history = [] }) {
+export default function AnalyticsPage({ username, progress = {}, history = [], dyslexiaMode = false }) {
   // Extract core progress metrics
   const tasksCompleted = progress?.tasksCompleted || 0;
   const currentStreak = progress?.currentStreak || 0;
@@ -95,45 +110,49 @@ export default function AnalyticsPage({ username, progress = {}, history = [] })
   const displayName = (username || "").trim() || "User";
 
   return (
-    <section className="analytics-page">
+    <StyledAnalyticsPage>
       {/* Header Section */}
-      <div className="analytics-header">
+      <AnalyticsHeader>
         <div>
-          <h2 className="analytics-title">Analytics</h2>
-          <p className="analytics-subtitle">
-            A quick snapshot of your progress, {displayName}.
-          </p>
+          <AnalyticsTitle>Analytics</AnalyticsTitle>
+          {!dyslexiaMode && (
+            <AnalyticsSubtitle>
+              A quick snapshot of your progress, {displayName}.
+            </AnalyticsSubtitle>
+          )}
         </div>
-      </div>
+      </AnalyticsHeader>
 
       {/* Summary Stat Cards */}
-      <div className="analytics-metrics">
-        <div className="analytics-metric analytics-metric-primary">
-          <div className="analytics-metric-label">Total tasks</div>
-          <div className="analytics-metric-value">{tasksCompleted}</div>
-        </div>
-        <div className="analytics-metric">
-          <div className="analytics-metric-label">Current streak</div>
-          <div className="analytics-metric-value">{currentStreak}</div>
-        </div>
-        <div className="analytics-metric">
-          <div className="analytics-metric-label">Active days</div>
-          <div className="analytics-metric-value">{completedDates.length}</div>
-        </div>
-        <div className="analytics-metric">
-          <div className="analytics-metric-label">Last completed</div>
-          <div className="analytics-metric-value small">{lastCompletedLabel}</div>
-        </div>
-      </div>
+      <AnalyticsMetrics>
+        <AnalyticsMetric className="analytics-metric-primary">
+          <AnalyticsMetricLabel>Total tasks</AnalyticsMetricLabel>
+          <AnalyticsMetricValue>{tasksCompleted}</AnalyticsMetricValue>
+        </AnalyticsMetric>
+        <AnalyticsMetric>
+          <AnalyticsMetricLabel>Current streak</AnalyticsMetricLabel>
+          <AnalyticsMetricValue>{currentStreak}</AnalyticsMetricValue>
+        </AnalyticsMetric>
+        <AnalyticsMetric>
+          <AnalyticsMetricLabel>Active days</AnalyticsMetricLabel>
+          <AnalyticsMetricValue>{completedDates.length}</AnalyticsMetricValue>
+        </AnalyticsMetric>
+        <AnalyticsMetric>
+          <AnalyticsMetricLabel>Last completed</AnalyticsMetricLabel>
+          <AnalyticsMetricValue className="small">{lastCompletedLabel}</AnalyticsMetricValue>
+        </AnalyticsMetric>
+      </AnalyticsMetrics>
 
       {/* Visualization Grid */}
-      <div className="analytics-grid">
+      <AnalyticsGrid>
         {/* Weekly Productivity Bar Chart */}
-        <div className="card analytics-card">
-          <h4 className="analytics-card-title">Activity by Day of Week</h4>
-          <p className="analytics-card-subtitle">
-            Which days are you most productive?
-          </p>
+        <AnalyticsCard>
+          <AnalyticsCardTitle>Activity by Day of Week</AnalyticsCardTitle>
+          {!dyslexiaMode && (
+            <AnalyticsCardSubtitle>
+              Which days are you most productive?
+            </AnalyticsCardSubtitle>
+          )}
           <ResponsiveContainer width="100%" height={250}>
             <BarChart data={weekdayStats} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
@@ -156,14 +175,16 @@ export default function AnalyticsPage({ username, progress = {}, history = [] })
               />
             </BarChart>
           </ResponsiveContainer>
-        </div>
+        </AnalyticsCard>
 
         {/* Performance Overview Radar Chart */}
-        <div className="card analytics-card">
-          <h4 className="analytics-card-title">Performance Radar</h4>
-          <p className="analytics-card-subtitle">
-            Your overall performance metrics.
-          </p>
+        <AnalyticsCard>
+          <AnalyticsCardTitle>Performance Radar</AnalyticsCardTitle>
+          {!dyslexiaMode && (
+            <AnalyticsCardSubtitle>
+              Your overall performance metrics.
+            </AnalyticsCardSubtitle>
+          )}
           <ResponsiveContainer width="100%" height={250}>
             <RadarChart data={performanceMetrics}>
               <PolarGrid stroke="#e0e0e0" />
@@ -187,23 +208,39 @@ export default function AnalyticsPage({ username, progress = {}, history = [] })
               />
             </RadarChart>
           </ResponsiveContainer>
-        </div>
+        </AnalyticsCard>
 
         {/* Actionable Tips & Insights */}
-        <div className="card analytics-card">
-          <h4 className="analytics-card-title">Quick tips</h4>
-          <p className="analytics-card-subtitle">
-            Small changes that help you keep momentum.
-          </p>
-          <ul className="analytics-tips">
-            <li>Keep tasks short and specific.</li>
-            <li>Try finishing one task daily to build streak.</li>
-            <li>Use Settings to tune step granularity.</li>
-            <li>Most productive day: <strong>{weekdayStats.reduce((max, day) => day.Tasks > max.Tasks ? day : max, weekdayStats[0])?.day || 'N/A'}</strong></li>
-          </ul>
-        </div>
-      </div>
-    </section>
+        <AnalyticsCard>
+          <AnalyticsCardTitle>Quick tips</AnalyticsCardTitle>
+          {!dyslexiaMode && (
+            <AnalyticsCardSubtitle>
+              Small changes that help you keep momentum.
+            </AnalyticsCardSubtitle>
+          )}
+          {dyslexiaMode ? (
+            <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginTop: "12px" }}>
+              <div style={{ background: "#e0e7ff", padding: "16px", borderRadius: "18px", fontWeight: "900", display: "flex", alignItems: "center", gap: "10px", color: "#1e1b4b", border: "2px solid #c7d2fe" }}>
+                🚀 Keep tasks short & fun!
+              </div>
+              <div style={{ background: "#e0f2fe", padding: "16px", borderRadius: "18px", fontWeight: "900", display: "flex", alignItems: "center", gap: "10px", color: "#1e1b4b", border: "2px solid #bae6fd" }}>
+                🔥 Tackle 1 task daily to streak!
+              </div>
+              <div style={{ background: "#dcfce7", padding: "16px", borderRadius: "18px", fontWeight: "900", display: "flex", alignItems: "center", gap: "10px", color: "#1e1b4b", border: "2px solid #bbf7d0" }}>
+                ✨ Adjust steps in Settings!
+              </div>
+            </div>
+          ) : (
+            <AnalyticsTips>
+              <li>Keep tasks short and specific.</li>
+              <li>Try finishing one task daily to build streak.</li>
+              <li>Use Settings to tune step granularity.</li>
+              <li>Most productive day: <strong>{weekdayStats.reduce((max, day) => day.Tasks > max.Tasks ? day : max, weekdayStats[0])?.day || 'N/A'}</strong></li>
+            </AnalyticsTips>
+          )}
+        </AnalyticsCard>
+      </AnalyticsGrid>
+    </StyledAnalyticsPage>
   );
 }
 
