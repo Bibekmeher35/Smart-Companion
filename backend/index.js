@@ -77,8 +77,10 @@ async function callGemini(prompt) {
           },
         ],
         generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 500,
+          temperature: 0.9,
+          maxOutputTokens: 2048,
+          topP: 0.95,
+          topK: 40,
         },
       }),
     },
@@ -149,36 +151,51 @@ app.post("/decompose", authenticateToken, async (req, res) => {
 
     // Define rules based on the user's preferred step detail level
     const stepRules = {
-      low: "Break the task into 3–4 high-level steps.",
-      medium: "Break the task into 5–7 clear steps.",
-      high: "Break the task into very small, concrete micro-steps (8–12 steps).",
+      low: "You MUST provide exactly 3 to 5 high-level steps. Count them before responding.",
+      medium: "You MUST provide exactly 6 to 8 clear, detailed steps. Count them before responding.",
+      high: "You MUST provide exactly 10 to 15 very small, concrete micro-steps. Count them before responding.",
+    };
+
+    const stepExamples = {
+      low: "Example for 'Clean room': 1. Pick up items from floor 2. Organize desk 3. Make bed 4. Vacuum floor",
+      medium: "Example for 'Clean room': 1. Pick up clothes 2. Put clothes in hamper 3. Clear desk surface 4. Organize desk items 5. Make bed neatly 6. Vacuum entire floor 7. Empty trash bin",
+      high: "Example for 'Clean room': 1. Pick up one piece of clothing 2. Put it in hamper 3. Repeat for all clothes 4. Clear left side of desk 5. Clear right side of desk 6. Wipe desk with cloth 7. Organize pens and pencils 8. Stack books neatly 9. Pull up bottom sheet 10. Pull up top sheet 11. Arrange pillows 12. Plug in vacuum 13. Vacuum under bed 14. Vacuum main floor 15. Empty trash",
     };
 
     // Construct the prompt for the AI, incorporating neuro-inclusive guidelines
-    const prompt = `
-You are a neuro-inclusive task assistant.
+    const prompt = `You are a neuro-inclusive task breakdown assistant for people with ADHD, Autism, and Dyslexia.
 
-CRITICAL RULES:
+IMPORTANT REQUIREMENTS:
+1. You MUST generate the EXACT number of steps specified below
+2. DO NOT stop generating steps until you reach the required count
+3. Each step must be a complete, actionable instruction
+4. Number each step clearly (1. 2. 3. etc.)
+
+FORMATTING RULES:
 - DO NOT include any thinking, reasoning, or internal monologue
-- DO NOT include phrases like "Wait", "Let me think", or any meta-commentary
+- DO NOT include phrases like "Wait", "Let me think", or any meta-commentary  
 - DO NOT include asterisks, parentheses with thoughts, or any analysis
-- Return ONLY the actionable steps, nothing else
-- Use very simple language
-- One action per step
-- No explanations
-- No emojis
-- Max 1 short sentence per step
+- DO NOT add introductions or conclusions
+- Return ONLY the numbered steps, nothing else
+- Use very simple, clear language
+- One specific action per step
+- No explanations or justifications
+- No emojis or special characters
+- Each step should be one short, complete sentence
 
-User preferences:
-- Step detail: ${profile.stepLevel || "medium"}
-- Dyslexia-friendly mode: ${profile.dyslexiaMode ? "Yes" : "No"}
+USER PROFILE:
+- Step detail level: ${profile.stepLevel || "medium"}
+- Dyslexia-friendly mode: ${profile.dyslexiaMode ? "Yes (use extra simple words)" : "No"}
 
-Task:
+TASK TO BREAK DOWN:
 "${cleanTask}"
 
+REQUIREMENT:
 ${stepRules[profile.stepLevel] || stepRules["medium"]}
 
-Return ONLY the steps as a numbered list
+${stepExamples[profile.stepLevel] || stepExamples["medium"]}
+
+Now break down the task "${cleanTask}" following the same format. Generate ALL required steps:
 `;
 
     // Fetch steps from Gemini AI with timeout
@@ -210,10 +227,28 @@ Return ONLY the steps as a numbered list
     // Log raw AI response for debugging
     console.log("\n=== RAW AI RESPONSE ===");
     console.log(text);
+    console.log(`Response length: ${text.length} characters`);
     console.log("=== END RAW RESPONSE ===\n");
 
     // Process the text to clean up step numbering, empty lines, and filter out AI reasoning
-    const allLines = text.split("\n").map((s) => s.trim()).filter(Boolean);
+    // First, try to split by newlines
+    let allLines = text.split("\n").map((s) => s.trim()).filter(Boolean);
+    
+    // If we only get 1-2 lines, the AI might have used different formatting
+    // Try splitting by numbered patterns like "1." or "1)" 
+    if (allLines.length <= 2) {
+      console.log("WARNING: Only got 1-2 lines, trying alternative split methods...");
+      
+      // Try splitting by number patterns
+      const numberPattern = /(?=\d+[\.\)]\s)/g;
+      const splitByNumbers = text.split(numberPattern).map(s => s.trim()).filter(Boolean);
+      
+      if (splitByNumbers.length > allLines.length) {
+        console.log(`Found ${splitByNumbers.length} steps using number pattern split`);
+        allLines = splitByNumbers;
+      }
+    }
+    
     console.log("\n=== ALL LINES AFTER SPLIT ===");
     allLines.forEach((line, idx) => console.log(`Line ${idx + 1}: ${line}`));
     console.log("=== END ALL LINES ===\n");
@@ -239,7 +274,22 @@ Return ONLY the steps as a numbered list
 
     console.log("\n=== FINAL STEPS ===");
     steps.forEach((step, idx) => console.log(`Step ${idx + 1}: ${step}`));
+    console.log(`Total steps generated: ${steps.length}`);
     console.log("=== END FINAL STEPS ===\n");
+
+    // Validate minimum step count based on granularity
+    const minSteps = {
+      low: 3,
+      medium: 6,
+      high: 10,
+    };
+    
+    const requiredMin = minSteps[profile.stepLevel] || minSteps["medium"];
+    
+    if (steps.length < requiredMin) {
+      console.warn(`WARNING: Only ${steps.length} steps generated, expected at least ${requiredMin}`);
+      console.warn("This might indicate the AI response was truncated or incomplete");
+    }
 
     if (steps.length === 0) {
       throw new Error("No steps generated from AI response");

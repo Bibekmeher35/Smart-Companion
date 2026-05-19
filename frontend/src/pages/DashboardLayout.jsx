@@ -1,13 +1,11 @@
-import React, { useEffect, useState, useMemo, useRef } from "react";
+import React, { useEffect, useState, useMemo, useRef, lazy, Suspense } from "react";
 import Calendar from "../components/Calendar";
 import TasksChart from "../components/TasksChart";
-import TaskPage from "./TaskPage";
-import ProfileSettings from "./ProfileSettings";
-import AnalyticsPage from "./AnalyticsPage";
-import ChartsPage from "./ChartsPage";
-import { authAPI } from "../utils/api";
 import TodoList from "../components/TodoList";
 import SearchModal from "../components/SearchModal";
+import { useAuth } from "../context/AuthContext";
+import { useProgress } from "../context/ProgressContext";
+import { authAPI } from "../utils/api";
 import {
   MdHome,
   MdChecklist,
@@ -84,6 +82,12 @@ import {
   ChangePasswordStatus,
   ChangePasswordButton,
 } from '../styles/ComponentStyles';
+
+// Lazy load page components
+const TaskPage = lazy(() => import('./TaskPage'));
+const ProfileSettings = lazy(() => import('./ProfileSettings'));
+const AnalyticsPage = lazy(() => import('./AnalyticsPage'));
+const ChartsPage = lazy(() => import('./ChartsPage'));
 
 function ChangePasswordSection({ username, profile }) {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -198,27 +202,15 @@ function ChangePasswordSection({ username, profile }) {
   );
 }
 
-export default function DashboardLayout({
-  username,
-  progress,
-  history = [],
-  profile,
-  todos = [],
-  onAddTodo,
-  onToggleTodo,
-  onDeleteTodo,
-  updateProfile,
-  onLogout,
-  task,
-  setTask,
-  steps,
-  currentIndex,
-  sendTask,
-  markDone,
-  goToPreviousStep,
-  taskFinished,
-  resetTaskSession,
-}) {
+export default function DashboardLayout() {
+  const { session, logout } = useAuth();
+  const { handleAddTodo, handleToggleTodo, handleDeleteTodo } = useProgress();
+
+  const username = session?.username;
+  const progress = session?.userData?.progress || {};
+  const history = session?.userData?.history || [];
+  const profile = session?.userData?.profile || {};
+  const todos = session?.userData?.todos || [];
   const [sidebarOpen, setSidebarOpen] = useState(() => {
     if (typeof window === "undefined") return true;
     return window.innerWidth >= 992;
@@ -336,7 +328,7 @@ export default function DashboardLayout({
         </SideList>
 
         <SideFull $closed={!sidebarOpen}>
-          <LogoutButton $closed={!sidebarOpen} onClick={() => { if (onLogout) onLogout(); }}>
+          <LogoutButton $closed={!sidebarOpen} onClick={logout}>
             <LogoutIcon $closed={!sidebarOpen}>
               <MdLogout />
             </LogoutIcon>
@@ -409,31 +401,26 @@ export default function DashboardLayout({
         )}
 
         {activeItem === "task" ? (
-          <TaskPage
-            task={task}
-            setTask={setTask}
-            steps={steps}
-            currentIndex={currentIndex}
-            sendTask={sendTask}
-            markDone={markDone}
-            goToPreviousStep={goToPreviousStep}
-            taskFinished={taskFinished}
-            resetTaskSession={resetTaskSession}
-            onBack={() => setActiveItem("dashboard")}
-          />
+          <Suspense fallback={<div style={{ padding: "40px", textAlign: "center" }}>Loading...</div>}>
+            <TaskPage onBack={() => setActiveItem("dashboard")} />
+          </Suspense>
         ) : activeItem === "analytics" ? (
-          <AnalyticsPage
-            username={username}
-            progress={progress || {}}
-            history={history || []}
-            dyslexiaMode={!!profile?.dyslexiaMode}
-          />
+          <Suspense fallback={<div style={{ padding: "40px", textAlign: "center" }}>Loading...</div>}>
+            <AnalyticsPage
+              username={username}
+              progress={progress || {}}
+              history={history || []}
+              dyslexiaMode={!!profile?.dyslexiaMode}
+            />
+          </Suspense>
         ) : activeItem === "charts" ? (
-          <ChartsPage
-            progress={progress || {}}
-            history={history || []}
-            dyslexiaMode={!!profile?.dyslexiaMode}
-          />
+          <Suspense fallback={<div style={{ padding: "40px", textAlign: "center" }}>Loading...</div>}>
+            <ChartsPage
+              progress={progress || {}}
+              history={history || []}
+              dyslexiaMode={!!profile?.dyslexiaMode}
+            />
+          </Suspense>
         ) : activeItem === "settings" ? (
           <SettingsSection>
             <SettingsCard>
@@ -443,7 +430,9 @@ export default function DashboardLayout({
                   Tune how Smart Companion breaks down your tasks.
                 </SettingsSubtitle>
               )}
-              <ProfileSettings profile={profile || {}} onSave={updateProfile} />
+              <Suspense fallback={<div style={{ padding: "20px", textAlign: "center" }}>Loading...</div>}>
+                <ProfileSettings />
+              </Suspense>
             </SettingsCard>
 
             <SettingsCard>
@@ -549,9 +538,9 @@ export default function DashboardLayout({
                 <Card className="wide">
                   <TodoList
                     todos={todos}
-                    onAddTodo={onAddTodo}
-                    onToggleTodo={onToggleTodo}
-                    onDeleteTodo={onDeleteTodo}
+                    onAddTodo={handleAddTodo}
+                    onToggleTodo={handleToggleTodo}
+                    onDeleteTodo={handleDeleteTodo}
                   />
                 </Card>
 

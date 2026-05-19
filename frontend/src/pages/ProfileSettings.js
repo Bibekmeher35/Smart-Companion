@@ -1,4 +1,5 @@
 import React from "react";
+import { useAuth } from "../context/AuthContext";
 import {
   ProfileRow,
   ProfileLabel,
@@ -11,12 +12,16 @@ import {
   SettingsDescription,
 } from '../styles/ComponentStyles';
 
-function ProfileSettings({ profile = {}, onSave }) {
+function ProfileSettings() {
+  const { session, updateProfile } = useAuth();
+  const profile = session?.userData?.profile || {};
   const stepLevel = profile.stepLevel || "medium";
   const dyslexiaMode = !!profile.dyslexiaMode;
 
   const update = (key, value) => {
-    onSave({ ...profile, [key]: value });
+    updateProfile({ ...profile, [key]: value }).catch((error) => {
+      alert("Failed to update profile. Please try again.");
+    });
   };
 
   return (

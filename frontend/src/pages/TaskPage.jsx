@@ -1,22 +1,15 @@
 import React, { useState } from "react";
+import { useTask } from "../context/TaskContext";
+import { useProgress } from "../context/ProgressContext";
 
 /**
  * TaskPage Component.
  * The core interaction area where users input a task, watch it get decomposed by AI,
  * and then follow the generated steps one-by-one.
  */
-export default function TaskPage({
-  task,
-  setTask,
-  steps,
-  currentIndex,
-  sendTask,
-  markDone,
-  goToPreviousStep,
-  taskFinished,
-  resetTaskSession,
-  onBack,
-}) {
+export default function TaskPage({ onBack }) {
+  const { task, setTask, steps, currentIndex, setCurrentIndex, sendTask, goToPreviousStep, taskFinished, setTaskFinished, resetTaskSession, currentTaskTitle } = useTask();
+  const { markDone } = useProgress();
   const [loading, setLoading] = useState(false);
 
   // Helper to identify if the user is on the final step of the decomposition
@@ -27,7 +20,7 @@ export default function TaskPage({
    * If it's the last step, the markDone call (in App.js) will trigger taskFinished.
    */
   const handleMarkDone = () => {
-    markDone();
+    markDone(currentIndex, steps, currentTaskTitle, setCurrentIndex, setTaskFinished);
   };
 
   /**
@@ -61,6 +54,17 @@ export default function TaskPage({
         <input
           value={task}
           onChange={(e) => setTask(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !loading && task.trim()) {
+              e.preventDefault();
+              const generateTask = async () => {
+                setLoading(true);
+                await sendTask();
+                setLoading(false);
+              };
+              generateTask();
+            }
+          }}
           placeholder="Enter your task (ex: How to clean room)"
           style={{
             flex: 1,
