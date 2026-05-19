@@ -3,20 +3,20 @@
  * Provides a structured way to interact with the backend services.
  */
 
-// const isLocalhost = Boolean(
-//   window.location.hostname === "localhost" ||
-//   window.location.hostname === "[::1]" ||
-//   // Local network IPs (10.x.x.x, 172.16.x.x to 172.31.x.x, 192.168.x.x)
-//   window.location.hostname.match(
-//     /^(?:10|127|172\.(?:1[6-9]|2[0-9]|3[01])|192\.168)\./
-//   )
-// );
+const isLocalhost = Boolean(
+  window.location.hostname === "localhost" ||
+  window.location.hostname === "[::1]" ||
+  // Local network IPs (10.x.x.x, 172.16.x.x to 172.31.x.x, 192.168.x.x)
+  window.location.hostname.match(
+    /^(?:10|127|172\.(?:1[6-9]|2[0-9]|3[01])|192\.168)\./,
+  ),
+);
 
-// const API_URL = isLocalhost
-//   ? `http://${window.location.hostname}:5050`
-//   : "https://smart-companion-5znk.onrender.com";
+const API_URL = isLocalhost
+  ? `http://${window.location.hostname}:5050`
+  : "https://smart-companion-5znk.onrender.com";
 // const API_URL = "https://smart-companion-5znk.onrender.com";
-const API_URL = `http://${window.location.hostname}:5050`;
+// const API_URL = `http://${window.location.hostname}:5050`;
 /**
  * Helper to retrieve the JWT token from local storage and format it for the Authorization header.
  * @returns {Object} - An object containing the Authorization header or an empty object.
