@@ -35,7 +35,7 @@ app.use(
       if (!origin) return callback(null, true);
 
       const isLocalNetwork = origin.match(
-        /^http:\/\/(?:localhost|127|10|172\.(?:1[6-9]|2[0-9]|3[01])|192\.168)\./
+        /^http:\/\/(?:localhost|127|10|172\.(?:1[6-9]|2[0-9]|3[01])|192\.168)\./,
       );
 
       if (allowedOrigins.indexOf(origin) !== -1 || isLocalNetwork) {
@@ -59,9 +59,14 @@ app.use(express.json());
  * @returns {Promise<string>} - The generated text response from the AI.
  */
 async function callGemini(prompt) {
+  const apiKey = process.env.GEMINI_API_KEY;
+
+  if (!apiKey) {
+    throw new Error("GEMINI_API_KEY is not configured");
+  }
+
   const response = await fetch(
-    "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent?key=" +
-      process.env.GEMINI_API_KEY,
+    `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -71,16 +76,26 @@ async function callGemini(prompt) {
             parts: [{ text: prompt }],
           },
         ],
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 500,
+        },
       }),
     },
   );
 
   if (!response.ok) {
     const errorData = await response.text();
+    console.error("Gemini API Response:", errorData);
     throw new Error(`Gemini API Error: ${response.status} - ${errorData}`);
   }
 
   const data = await response.json();
+
+  if (!data.candidates || !data.candidates[0] || !data.candidates[0].content) {
+    throw new Error("Invalid response structure from Gemini API");
+  }
+
   return data.candidates[0].content.parts[0].text;
 }
 
@@ -88,7 +103,24 @@ async function callGemini(prompt) {
  * Health check route to verify if the server is running.
  */
 app.get("/", (req, res) => {
-  res.send("Smart Companion Backend Running");
+  res.json({
+    status: "running",
+    service: "Smart Companion Backend",
+    timestamp: new Date().toISOString(),
+    geminiConfigured: !!process.env.GEMINI_API_KEY,
+    mongodbConfigured: !!process.env.MONGODB_URI,
+  });
+});
+
+/**
+ * Detailed health check for monitoring.
+ */
+app.get("/health", (req, res) => {
+  res.json({
+    status: "healthy",
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+  });
 });
 
 // Authentication routes (Login, Signup, etc.)
@@ -101,6 +133,16 @@ app.use("/api/auth", authRoutes);
  */
 app.post("/decompose", authenticateToken, async (req, res) => {
   try {
+    // Validate Gemini API key
+    if (!process.env.GEMINI_API_KEY) {
+      console.error("GEMINI_API_KEY not configured");
+      return res.status(500).json({
+        error: "Server configuration error",
+        message:
+          "AI service is not properly configured. Please contact support.",
+      });
+    }
+
     // Sanitize input to prevent injection attacks and clean the task description
     const cleanTask = sanitize(req.body.task);
     const profile = req.body.profile || {};
@@ -116,7 +158,11 @@ app.post("/decompose", authenticateToken, async (req, res) => {
     const prompt = `
 You are a neuro-inclusive task assistant.
 
-Rules:
+CRITICAL RULES:
+- DO NOT include any thinking, reasoning, or internal monologue
+- DO NOT include phrases like "Wait", "Let me think", or any meta-commentary
+- DO NOT include asterisks, parentheses with thoughts, or any analysis
+- Return ONLY the actionable steps, nothing else
 - Use very simple language
 - One action per step
 - No explanations
@@ -132,27 +178,70 @@ Task:
 
 ${stepRules[profile.stepLevel] || stepRules["medium"]}
 
-Return ONLY the steps, each on a new line.
+Return ONLY the steps as a numbered list. Example format:
+1. First step
+2. Second step
+3. Third step
 `;
 
-    // Fetch steps from Gemini AI
-    const text = await callGemini(prompt);
+    // Fetch steps from Gemini AI with timeout
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 25000); // 25s timeout
 
-    // Process the text to clean up step numbering and empty lines
+    let text;
+    try {
+      text = await callGemini(prompt);
+      clearTimeout(timeout);
+    } catch (geminiError) {
+      clearTimeout(timeout);
+      console.error("Gemini API Error:", geminiError.message);
+
+      // Check if it's a rate limit or quota error
+      if (
+        geminiError.message.includes("429") ||
+        geminiError.message.includes("quota")
+      ) {
+        return res.status(429).json({
+          error: "Rate limit exceeded",
+          message: "Too many requests. Please wait a moment and try again.",
+        });
+      }
+
+      throw geminiError;
+    }
+
+    // Process the text to clean up step numbering, empty lines, and filter out AI reasoning
     const steps = text
       .split("\n")
       .map((s) => s.replace(/^\d+[.)\s]*/, "").trim())
-      .filter(Boolean);
+      .filter(Boolean)
+      .filter((s) => {
+        // Remove lines that look like AI's internal thinking
+        const thinkingPatterns = [
+          /^\*.*\*$/,  // Lines wrapped in asterisks
+          /^wait,/i,   // Lines starting with "wait"
+          /^let me/i,  // Lines starting with "let me"
+          /^step \d+ of \d+/i,  // Progress indicators
+          /^\(/,       // Lines starting with parentheses
+        ];
+        return !thinkingPatterns.some(pattern => pattern.test(s));
+      });
 
+    if (steps.length === 0) {
+      throw new Error("No steps generated from AI response");
+    }
+    console.log(steps);
     return res.json({ steps });
   } catch (error) {
     console.error("Task Decomposition Error:", error.message);
 
-    // Return a structured error instead of hardcoded steps
+    // Return a structured error
     return res.status(503).json({
       error: "The AI service is temporarily unavailable.",
-      message: "We couldn't break down this task right now. Please try again in a few seconds.",
-      details: error.message
+      message:
+        "We couldn't break down this task right now. Please try again in a few seconds.",
+      details:
+        process.env.NODE_ENV === "development" ? error.message : undefined,
     });
   }
 });
@@ -165,4 +254,3 @@ const PORT = process.env.PORT || 5050;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
